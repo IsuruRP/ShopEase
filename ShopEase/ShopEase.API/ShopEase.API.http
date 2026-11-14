@@ -1,6 +1,44 @@
 @ShopEase.API_HostAddress = http://localhost:5083
 
-GET {{ShopEase.API_HostAddress}}/weatherforecast/
+GET {{ShopEase.API_HostAddress}}/
+Accept: text/plain
+
+###
+
+GET {{ShopEase.API_HostAddress}}/api/products
 Accept: application/json
+
+###
+
+GET {{ShopEase.API_HostAddress}}/api/products/1
+Accept: application/json
+
+###
+
+POST {{ShopEase.API_HostAddress}}/api/products
+Content-Type: application/json
+
+{
+  "name": "Tablet",
+  "description": "10-inch Android Tablet",
+  "price": 65000,
+  "stock": 15
+}
+
+###
+
+PUT {{ShopEase.API_HostAddress}}/api/products/3
+Content-Type: application/json
+
+{
+  "name": "Tablet Pro",
+  "description": "12-inch Android Tablet",
+  "price": 95000,
+  "stock": 8
+}
+
+###
+
+DELETE {{ShopEase.API_HostAddress}}/api/products/3
 
 ###
