@@ -15,6 +15,7 @@ Accept: application/json
 
 ###
 
+# @name createProduct
 POST {{ShopEase.API_HostAddress}}/api/products
 Content-Type: application/json
 
@@ -27,7 +28,12 @@ Content-Type: application/json
 
 ###
 
-PUT {{ShopEase.API_HostAddress}}/api/products/3
+GET {{ShopEase.API_HostAddress}}/api/products/{{createProduct.response.body.$.id}}
+Accept: application/json
+
+###
+
+PUT {{ShopEase.API_HostAddress}}/api/products/{{createProduct.response.body.$.id}}
 Content-Type: application/json
 
 {
@@ -39,6 +45,6 @@ Content-Type: application/json
 
 ###
 
-DELETE {{ShopEase.API_HostAddress}}/api/products/3
+DELETE {{ShopEase.API_HostAddress}}/api/products/{{createProduct.response.body.$.id}}
 
 ###

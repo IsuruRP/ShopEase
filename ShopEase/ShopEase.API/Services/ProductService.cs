@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using ShopEase.API.Data;
 using ShopEase.API.DTOs;
 using ShopEase.API.Models;
 
@@ -5,111 +7,88 @@ namespace ShopEase.API.Services
 {
     public class ProductService : IProductService
     {
-        private readonly object _syncRoot = new();
+        private readonly ShopEaseDbContext _dbContext;
 
-        private readonly List<Product> _products =
-        [
-            new Product
-            {
-                Id = 1,
-                Name = "Laptop",
-                Description = "Gaming Laptop",
-                Price = 250000m,
-                Stock = 10
-            },
-            new Product
-            {
-                Id = 2,
-                Name = "Smartphone",
-                Description = "Android Phone",
-                Price = 85000m,
-                Stock = 20
-            }
-        ];
-
-        private int _nextId = 3;
-
-        public IReadOnlyList<Product> GetAll()
+        public ProductService(ShopEaseDbContext dbContext)
         {
-            lock (_syncRoot)
-            {
-                return _products.Select(CopyProduct).ToList();
-            }
+            _dbContext = dbContext;
         }
 
-        public Product? GetById(int id)
+        public async Task<IReadOnlyList<Product>> GetAllAsync(
+            CancellationToken cancellationToken = default)
         {
-            lock (_syncRoot)
-            {
-                var product = _products.FirstOrDefault(product => product.Id == id);
-                return product is null ? null : CopyProduct(product);
-            }
+            return await _dbContext.Products
+                .AsNoTracking()
+                .OrderBy(product => product.Id)
+                .ToListAsync(cancellationToken);
         }
 
-        public Product Create(CreateProductRequest request)
+        public async Task<Product?> GetByIdAsync(
+            int id,
+            CancellationToken cancellationToken = default)
         {
-            lock (_syncRoot)
-            {
-                var product = new Product
-                {
-                    Id = _nextId++,
-                    Name = request.Name.Trim(),
-                    Description = request.Description.Trim(),
-                    Price = request.Price,
-                    Stock = request.Stock
-                };
-
-                _products.Add(product);
-                return CopyProduct(product);
-            }
+            return await _dbContext.Products
+                .AsNoTracking()
+                .SingleOrDefaultAsync(product => product.Id == id, cancellationToken);
         }
 
-        public Product? Update(int id, UpdateProductRequest request)
+        public async Task<Product> CreateAsync(
+            CreateProductRequest request,
+            CancellationToken cancellationToken = default)
         {
-            lock (_syncRoot)
+            var product = new Product
             {
-                var product = _products.FirstOrDefault(product => product.Id == id);
-
-                if (product is null)
-                {
-                    return null;
-                }
-
-                product.Name = request.Name.Trim();
-                product.Description = request.Description.Trim();
-                product.Price = request.Price;
-                product.Stock = request.Stock;
-
-                return CopyProduct(product);
-            }
-        }
-
-        public bool Delete(int id)
-        {
-            lock (_syncRoot)
-            {
-                var product = _products.FirstOrDefault(product => product.Id == id);
-
-                if (product is null)
-                {
-                    return false;
-                }
-
-                _products.Remove(product);
-                return true;
-            }
-        }
-
-        private static Product CopyProduct(Product product)
-        {
-            return new Product
-            {
-                Id = product.Id,
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                Stock = product.Stock
+                Name = request.Name.Trim(),
+                Description = request.Description.Trim(),
+                Price = request.Price,
+                Stock = request.Stock
             };
+
+            _dbContext.Products.Add(product);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return product;
+        }
+
+        public async Task<Product?> UpdateAsync(
+            int id,
+            UpdateProductRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            var product = await _dbContext.Products
+                .SingleOrDefaultAsync(product => product.Id == id, cancellationToken);
+
+            if (product is null)
+            {
+                return null;
+            }
+
+            product.Name = request.Name.Trim();
+            product.Description = request.Description.Trim();
+            product.Price = request.Price;
+            product.Stock = request.Stock;
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return product;
+        }
+
+        public async Task<bool> DeleteAsync(
+            int id,
+            CancellationToken cancellationToken = default)
+        {
+            var product = await _dbContext.Products
+                .SingleOrDefaultAsync(product => product.Id == id, cancellationToken);
+
+            if (product is null)
+            {
+                return false;
+            }
+
+            _dbContext.Products.Remove(product);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return true;
         }
     }
 }

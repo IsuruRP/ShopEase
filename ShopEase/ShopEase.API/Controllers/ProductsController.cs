@@ -17,16 +17,21 @@ namespace ShopEase.API.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<ProductResponse>> GetProducts()
+        public async Task<ActionResult<IEnumerable<ProductResponse>>> GetProducts(
+            CancellationToken cancellationToken)
         {
-            var products = _productService.GetAll().Select(ToResponse);
+            var products = (await _productService.GetAllAsync(cancellationToken))
+                .Select(ToResponse);
+
             return Ok(products);
         }
 
         [HttpGet("{id:int}")]
-        public ActionResult<ProductResponse> GetProduct(int id)
+        public async Task<ActionResult<ProductResponse>> GetProduct(
+            int id,
+            CancellationToken cancellationToken)
         {
-            var product = _productService.GetById(id);
+            var product = await _productService.GetByIdAsync(id, cancellationToken);
 
             if (product is null)
             {
@@ -37,18 +42,23 @@ namespace ShopEase.API.Controllers
         }
 
         [HttpPost]
-        public ActionResult<ProductResponse> CreateProduct(CreateProductRequest request)
+        public async Task<ActionResult<ProductResponse>> CreateProduct(
+            CreateProductRequest request,
+            CancellationToken cancellationToken)
         {
-            var product = _productService.Create(request);
+            var product = await _productService.CreateAsync(request, cancellationToken);
             var response = ToResponse(product);
 
             return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, response);
         }
 
         [HttpPut("{id:int}")]
-        public IActionResult UpdateProduct(int id, UpdateProductRequest request)
+        public async Task<IActionResult> UpdateProduct(
+            int id,
+            UpdateProductRequest request,
+            CancellationToken cancellationToken)
         {
-            var product = _productService.Update(id, request);
+            var product = await _productService.UpdateAsync(id, request, cancellationToken);
 
             if (product is null)
             {
@@ -59,9 +69,11 @@ namespace ShopEase.API.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        public IActionResult DeleteProduct(int id)
+        public async Task<IActionResult> DeleteProduct(
+            int id,
+            CancellationToken cancellationToken)
         {
-            var wasDeleted = _productService.Delete(id);
+            var wasDeleted = await _productService.DeleteAsync(id, cancellationToken);
 
             if (!wasDeleted)
             {

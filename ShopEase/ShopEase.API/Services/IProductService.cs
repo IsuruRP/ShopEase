@@ -5,14 +5,24 @@ namespace ShopEase.API.Services
 {
     public interface IProductService
     {
-        IReadOnlyList<Product> GetAll();
+        Task<IReadOnlyList<Product>> GetAllAsync(
+            CancellationToken cancellationToken = default);
 
-        Product? GetById(int id);
+        Task<Product?> GetByIdAsync(
+            int id,
+            CancellationToken cancellationToken = default);
 
-        Product Create(CreateProductRequest request);
+        Task<Product> CreateAsync(
+            CreateProductRequest request,
+            CancellationToken cancellationToken = default);
 
-        Product? Update(int id, UpdateProductRequest request);
+        Task<Product?> UpdateAsync(
+            int id,
+            UpdateProductRequest request,
+            CancellationToken cancellationToken = default);
 
-        bool Delete(int id);
+        Task<bool> DeleteAsync(
+            int id,
+            CancellationToken cancellationToken = default);
     }
 }
