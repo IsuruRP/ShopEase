@@ -16,5 +16,8 @@ namespace ShopEase.API.DTOs
 
         [Range(0, 1000000)]
         public int Stock { get; set; }
+
+        [Range(1, int.MaxValue)]
+        public int CategoryId { get; set; }
     }
 }

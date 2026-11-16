@@ -91,7 +91,9 @@ namespace ShopEase.API.Controllers
                 Name = product.Name,
                 Description = product.Description,
                 Price = product.Price,
-                Stock = product.Stock
+                Stock = product.Stock,
+                CategoryId = product.CategoryId,
+                CategoryName = product.Category.Name
             };
         }
     }

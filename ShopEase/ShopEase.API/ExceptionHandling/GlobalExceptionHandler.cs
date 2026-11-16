@@ -17,18 +17,43 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
         Exception exception,
         CancellationToken cancellationToken)
     {
-        _logger.LogError(
-            exception,
-            "Unhandled exception while processing {Method} {Path}. TraceId: {TraceId}",
-            httpContext.Request.Method,
-            httpContext.Request.Path,
-            httpContext.TraceIdentifier);
+        var (status, title, detail) = exception switch
+        {
+            KeyNotFoundException => (
+                StatusCodes.Status404NotFound,
+                "Resource not found.",
+                exception.Message),
+            _ => (
+                StatusCodes.Status500InternalServerError,
+                "An unexpected error occurred.",
+                "The server could not complete the request. Please try again later.")
+        };
+
+        if (status >= StatusCodes.Status500InternalServerError)
+        {
+            _logger.LogError(
+                exception,
+                "Unhandled exception while processing {Method} {Path}. TraceId: {TraceId}",
+                httpContext.Request.Method,
+                httpContext.Request.Path,
+                httpContext.TraceIdentifier);
+        }
+        else
+        {
+            _logger.LogWarning(
+                "Request {Method} {Path} failed with status {StatusCode}. TraceId: {TraceId}. Message: {Message}",
+                httpContext.Request.Method,
+                httpContext.Request.Path,
+                status,
+                httpContext.TraceIdentifier,
+                exception.Message);
+        }
 
         var problemDetails = new ProblemDetails
         {
-            Status = StatusCodes.Status500InternalServerError,
-            Title = "An unexpected error occurred.",
-            Detail = "The server could not complete the request. Please try again later.",
+            Status = status,
+            Title = title,
+            Detail = detail,
             Instance = httpContext.Request.Path
         };
 

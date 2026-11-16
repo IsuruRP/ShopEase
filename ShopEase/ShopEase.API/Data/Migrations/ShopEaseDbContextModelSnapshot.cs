@@ -21,6 +21,43 @@ namespace ShopEase.API.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ShopEase.API.Models.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Computers and related devices",
+                            Name = "Computers"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Smartphones and mobile devices",
+                            Name = "Mobile Phones"
+                        });
+                });
+
             modelBuilder.Entity("ShopEase.API.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -28,6 +65,9 @@ namespace ShopEase.API.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -48,12 +88,15 @@ namespace ShopEase.API.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
                     b.ToTable("Products", (string)null);
 
                     b.HasData(
                         new
                         {
                             Id = 1,
+                            CategoryId = 1,
                             Description = "Gaming Laptop",
                             Name = "Laptop",
                             Price = 250000m,
@@ -62,11 +105,28 @@ namespace ShopEase.API.Data.Migrations
                         new
                         {
                             Id = 2,
+                            CategoryId = 2,
                             Description = "Android Phone",
                             Name = "Smartphone",
                             Price = 85000m,
                             Stock = 20
                         });
+                });
+
+            modelBuilder.Entity("ShopEase.API.Models.Product", b =>
+                {
+                    b.HasOne("ShopEase.API.Models.Category", "Category")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("ShopEase.API.Models.Category", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }
