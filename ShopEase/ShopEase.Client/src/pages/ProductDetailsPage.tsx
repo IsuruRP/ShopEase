@@ -5,6 +5,8 @@ import { getApiErrorMessage } from "../api/client";
 import { BrandMark } from "../components/BrandMark";
 import { PageState } from "../components/PageState";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
+import { useState } from "react";
 
 const formatPrice = new Intl.NumberFormat("en-LK", {
   style: "currency",
@@ -16,6 +18,8 @@ export function ProductDetailsPage() {
   const { id } = useParams();
   const productId = Number(id);
   const { isAuthenticated, session } = useAuth();
+  const { addItem } = useCart();
+  const [added, setAdded] = useState(false);
   const productQuery = useQuery({
     queryKey: ["product", productId],
     queryFn: () => getProduct(productId),
@@ -59,8 +63,8 @@ export function ProductDetailsPage() {
               <div><span>Availability</span><strong>{productQuery.data.stock > 0 ? "Ready to order" : "Unavailable"}</strong></div>
             </div>
             <div className="detail-actions">
-              <Link className="detail-primary" to={isAuthenticated ? "/products" : "/register"}>{isAuthenticated ? "Continue shopping" : "Create account to shop"}<span>→</span></Link>
-              <Link className="detail-secondary" to="/">Back to home</Link>
+              <button className="detail-primary" disabled={productQuery.data.stock===0} onClick={()=>{addItem(productQuery.data);setAdded(true);}}>{added ? "Added to cart ✓" : "Add to cart"}<span>→</span></button>
+              <Link className="detail-secondary" to="/cart">View cart</Link>
             </div>
             <div className="detail-assurance"><span>✓</span><p><strong>Clear and reliable</strong><small>Live pricing, availability, and product information from ShopEase.</small></p></div>
           </section>

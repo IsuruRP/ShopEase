@@ -6,6 +6,8 @@ import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
 import { ProductsPage } from "./pages/ProductsPage";
 import { ProductDetailsPage } from "./pages/ProductDetailsPage";
+import { CartPage } from "./pages/CartPage";
+import { CheckoutPage } from "./pages/CheckoutPage";
 import { RegisterPage } from "./pages/RegisterPage";
 
 export default function App() {
@@ -13,10 +15,12 @@ export default function App() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/products/:id" element={<ProductDetailsPage />} />
+      <Route path="/cart" element={<CartPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
       <Route element={<ProtectedRoute />}>
+        <Route path="/checkout" element={<CheckoutPage />} />
         <Route element={<AppShell />}>
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/categories" element={<CategoriesPage />} />

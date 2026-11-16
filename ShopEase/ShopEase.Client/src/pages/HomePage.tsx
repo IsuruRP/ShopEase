@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { getCategories, getProducts } from "../api/catalog";
 import { BrandMark } from "../components/BrandMark";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 
 const formatPrice = new Intl.NumberFormat("en-LK", {
   style: "currency",
@@ -12,6 +13,7 @@ const formatPrice = new Intl.NumberFormat("en-LK", {
 
 export function HomePage() {
   const { isAuthenticated, session } = useAuth();
+  const { itemCount } = useCart();
   const productsQuery = useQuery({ queryKey: ["products"], queryFn: getProducts });
   const categoriesQuery = useQuery({ queryKey: ["categories"], queryFn: getCategories });
   const featuredProducts = productsQuery.data?.slice(0, 3) ?? [];
@@ -30,6 +32,7 @@ export function HomePage() {
           <a href="#why-us">Why us</a>
         </nav>
         <div className="storefront-actions">
+          <Link className="nav-login" to="/cart">Cart ({itemCount})</Link>
           {isAuthenticated ? (
             <Link className="nav-account" to="/products">Hi, {session?.username}</Link>
           ) : (

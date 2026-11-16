@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { BrandMark } from "./BrandMark";
+import { useCart } from "../context/CartContext";
 
 function ProductsIcon() {
   return (
@@ -24,6 +25,7 @@ function CategoriesIcon() {
 
 export function AppShell() {
   const { session, logout } = useAuth();
+  const { itemCount } = useCart();
   const initial = session?.username.charAt(0).toUpperCase() ?? "S";
 
   return (
@@ -47,6 +49,7 @@ export function AppShell() {
             <CategoriesIcon />
             Categories
           </NavLink>
+          <NavLink to="/cart" className="cart-nav-link"><span className="cart-nav-icon">⌁</span>Cart {itemCount > 0 && <b>{itemCount}</b>}</NavLink>
         </nav>
 
         <div className="sidebar-note">
