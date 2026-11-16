@@ -51,6 +51,15 @@ builder.Services
         };
     });
 builder.Services.AddAuthorization();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ShopEaseClient", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 var connectionString = builder.Configuration.GetConnectionString("ShopEaseDatabase")
     ?? throw new InvalidOperationException(
@@ -68,6 +77,7 @@ var app = builder.Build();
 
 app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseExceptionHandler();
+app.UseCors("ShopEaseClient");
 app.UseAuthentication();
 app.UseAuthorization();
 
