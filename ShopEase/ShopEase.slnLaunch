@@ -1,0 +1,24 @@
+[
+  {
+    "Name": "ShopEase Full Stack",
+    "Projects": [
+      {
+        "Path": "ShopEase.API\\ShopEase.API.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "ShopEase.Client\\ShopEase.Client.esproj",
+        "Action": "Start"
+      }
+    ]
+  },
+  {
+    "Name": "ShopEase API Only",
+    "Projects": [
+      {
+        "Path": "ShopEase.API\\ShopEase.API.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

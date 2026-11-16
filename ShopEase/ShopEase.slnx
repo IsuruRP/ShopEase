@@ -1,3 +1,7 @@
 <Solution>
   <Project Path="ShopEase.API/ShopEase.API.csproj" />
+  <Project Path="ShopEase.Client/ShopEase.Client.esproj">
+    <Build />
+    <Deploy />
+  </Project>
 </Solution>
