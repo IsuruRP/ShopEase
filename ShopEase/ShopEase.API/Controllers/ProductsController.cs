@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShopEase.API.DTOs;
 using ShopEase.API.Models;
@@ -42,6 +43,7 @@ namespace ShopEase.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<ActionResult<ProductResponse>> CreateProduct(
             CreateProductRequest request,
             CancellationToken cancellationToken)
@@ -53,6 +55,7 @@ namespace ShopEase.API.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> UpdateProduct(
             int id,
             UpdateProductRequest request,
@@ -69,6 +72,7 @@ namespace ShopEase.API.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> DeleteProduct(
             int id,
             CancellationToken cancellationToken)

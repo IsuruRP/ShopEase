@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShopEase.API.DTOs;
 using ShopEase.API.Models;
@@ -42,6 +43,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = UserRoles.Admin)]
     public async Task<ActionResult<CategoryResponse>> CreateCategory(
         CreateCategoryRequest request,
         CancellationToken cancellationToken)
@@ -53,6 +55,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = UserRoles.Admin)]
     public async Task<IActionResult> UpdateCategory(
         int id,
         UpdateCategoryRequest request,
@@ -69,6 +72,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = UserRoles.Admin)]
     public async Task<IActionResult> DeleteCategory(
         int id,
         CancellationToken cancellationToken)

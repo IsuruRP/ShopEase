@@ -14,8 +14,20 @@ namespace ShopEase.API.Data
 
         public DbSet<Category> Categories => Set<Category>();
 
+        public DbSet<User> Users => Set<User>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            var user = modelBuilder.Entity<User>();
+
+            user.ToTable("Users");
+            user.HasKey(item => item.Id);
+            user.Property(item => item.Username).HasMaxLength(50).IsRequired();
+            user.Property(item => item.NormalizedUsername).HasMaxLength(50).IsRequired();
+            user.Property(item => item.PasswordHash).HasMaxLength(500).IsRequired();
+            user.Property(item => item.Role).HasMaxLength(20).IsRequired();
+            user.HasIndex(item => item.NormalizedUsername).IsUnique();
+
             var category = modelBuilder.Entity<Category>();
 
             category.ToTable("Categories");
