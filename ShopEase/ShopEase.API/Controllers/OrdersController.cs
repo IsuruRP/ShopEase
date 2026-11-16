@@ -45,8 +45,8 @@ public class OrdersController : ControllerBase
     public async Task<ActionResult<IEnumerable<OrderResponse>>> GetMine(CancellationToken token)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        return Ok((await _db.Orders.AsNoTracking().Where(order => order.UserId == userId).OrderByDescending(order => order.PlacedAtUtc).ToListAsync(token)).Select(ToResponse));
+        return Ok((await _db.Orders.AsNoTracking().Include(order => order.Items).Where(order => order.UserId == userId).OrderByDescending(order => order.PlacedAtUtc).ToListAsync(token)).Select(ToResponse));
     }
 
-    private static OrderResponse ToResponse(Order order) => new() { Id = order.Id, OrderNumber = order.OrderNumber, PlacedAtUtc = order.PlacedAtUtc, Status = order.Status, PaymentMethod = order.PaymentMethod, PaymentStatus = order.PaymentStatus, Subtotal = order.Subtotal, DeliveryFee = order.DeliveryFee, Total = order.Total };
+    private static OrderResponse ToResponse(Order order) => new() { Id = order.Id, OrderNumber = order.OrderNumber, PlacedAtUtc = order.PlacedAtUtc, Status = order.Status, PaymentMethod = order.PaymentMethod, PaymentStatus = order.PaymentStatus, Subtotal = order.Subtotal, DeliveryFee = order.DeliveryFee, Total = order.Total, FullName = order.FullName, Address = order.Address, City = order.City, Items = order.Items.Select(item => new OrderItemResponse { ProductId = item.ProductId, ProductName = item.ProductName, UnitPrice = item.UnitPrice, Quantity = item.Quantity, LineTotal = item.LineTotal }).ToList() };
 }

@@ -8,6 +8,7 @@ import { ProductsPage } from "./pages/ProductsPage";
 import { ProductDetailsPage } from "./pages/ProductDetailsPage";
 import { CartPage } from "./pages/CartPage";
 import { CheckoutPage } from "./pages/CheckoutPage";
+import { OrdersPage } from "./pages/OrdersPage";
 import { RegisterPage } from "./pages/RegisterPage";
 
 export default function App() {
@@ -24,6 +25,7 @@ export default function App() {
         <Route element={<AppShell />}>
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
+          <Route path="/orders" element={<OrdersPage />} />
         </Route>
       </Route>
 

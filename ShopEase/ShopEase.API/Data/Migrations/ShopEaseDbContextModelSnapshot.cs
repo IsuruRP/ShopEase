@@ -237,6 +237,54 @@ namespace ShopEase.API.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("ShopEase.API.Models.ShippingAddress", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("PostalCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ShippingAddresses", (string)null);
+                });
+
             modelBuilder.Entity("ShopEase.API.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -302,6 +350,15 @@ namespace ShopEase.API.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("ShopEase.API.Models.ShippingAddress", b =>
+                {
+                    b.HasOne("ShopEase.API.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ShopEase.API.Models.Category", b =>

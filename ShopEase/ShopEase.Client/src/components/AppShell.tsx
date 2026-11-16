@@ -50,6 +50,7 @@ export function AppShell() {
             Categories
           </NavLink>
           <NavLink to="/cart" className="cart-nav-link"><span className="cart-nav-icon">⌁</span>Cart {itemCount > 0 && <b>{itemCount}</b>}</NavLink>
+          <NavLink to="/orders"><span className="cart-nav-icon">□</span>My orders</NavLink>
         </nav>
 
         <div className="sidebar-note">
@@ -91,6 +92,14 @@ export function AppShell() {
           <NavLink to="/categories">
             <CategoriesIcon />
             <span>Categories</span>
+          </NavLink>
+          <NavLink to="/cart">
+            <span className="mobile-text-icon">Bag</span>
+            <span>Cart{itemCount > 0 ? ` (${itemCount})` : ""}</span>
+          </NavLink>
+          <NavLink to="/orders">
+            <span className="mobile-text-icon">#</span>
+            <span>Orders</span>
           </NavLink>
         </nav>
       </div>

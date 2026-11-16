@@ -17,9 +17,21 @@ namespace ShopEase.API.Data
         public DbSet<User> Users => Set<User>();
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+        public DbSet<ShippingAddress> ShippingAddresses => Set<ShippingAddress>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            var shippingAddress = modelBuilder.Entity<ShippingAddress>();
+            shippingAddress.ToTable("ShippingAddresses");
+            shippingAddress.HasKey(item => item.Id);
+            shippingAddress.Property(item => item.Label).HasMaxLength(30).IsRequired();
+            shippingAddress.Property(item => item.FullName).HasMaxLength(100).IsRequired();
+            shippingAddress.Property(item => item.Phone).HasMaxLength(30).IsRequired();
+            shippingAddress.Property(item => item.Address).HasMaxLength(300).IsRequired();
+            shippingAddress.Property(item => item.City).HasMaxLength(100).IsRequired();
+            shippingAddress.Property(item => item.PostalCode).HasMaxLength(20).IsRequired();
+            shippingAddress.HasOne<User>().WithMany().HasForeignKey(item => item.UserId).OnDelete(DeleteBehavior.Cascade);
+
             var order = modelBuilder.Entity<Order>();
             order.ToTable("Orders");
             order.HasKey(item => item.Id);
