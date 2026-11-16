@@ -6,6 +6,11 @@ export async function getProducts() {
   return data;
 }
 
+export async function getProduct(id: number) {
+  const { data } = await apiClient.get<Product>(`/products/${id}`);
+  return data;
+}
+
 export async function getCategories() {
   const { data } = await apiClient.get<Category[]>("/categories");
   return data;

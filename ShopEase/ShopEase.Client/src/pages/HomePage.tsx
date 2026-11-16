@@ -70,8 +70,10 @@ export function HomePage() {
             {productsQuery.isLoading && [1, 2, 3].map((item) => <div className="home-product-card home-loading" key={item} />)}
             {featuredProducts.map((product, index) => (
               <article className="home-product-card" key={product.id}>
+                <Link className="home-product-link" to={`/products/${product.id}`}>
                 <div className={`home-product-art home-art-${index + 1}`}><span>{product.name.charAt(0)}</span><small>{product.categoryName}</small></div>
                 <div className="home-product-copy"><span>{product.stock > 0 ? "In stock" : "Out of stock"}</span><h3>{product.name}</h3><p>{product.description}</p><strong>{formatPrice.format(product.price)}</strong></div>
+                </Link>
               </article>
             ))}
           </div>

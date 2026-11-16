@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getProducts } from "../api/catalog";
 import { getApiErrorMessage } from "../api/client";
 import { PageState } from "../components/PageState";
+import { Link } from "react-router-dom";
 
 const formatPrice = new Intl.NumberFormat("en-LK", {
   style: "currency",
@@ -87,6 +88,7 @@ export function ProductsPage() {
         <div className="product-grid">
           {filteredProducts.map((product, index) => (
             <article className="product-card" key={product.id}>
+              <Link className="product-card-link" to={`/products/${product.id}`}>
               <div className={`product-visual visual-${(index % 4) + 1}`}>
                 <span>{product.name.charAt(0)}</span>
                 <small>{product.categoryName}</small>
@@ -102,6 +104,7 @@ export function ProductsPage() {
                 <p>{product.description || "A thoughtful addition to your everyday."}</p>
                 <strong className="price">{formatPrice.format(product.price)}</strong>
               </div>
+              </Link>
             </article>
           ))}
         </div>
