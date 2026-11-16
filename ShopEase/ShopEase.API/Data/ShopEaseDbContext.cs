@@ -15,9 +15,38 @@ namespace ShopEase.API.Data
         public DbSet<Category> Categories => Set<Category>();
 
         public DbSet<User> Users => Set<User>();
+        public DbSet<Order> Orders => Set<Order>();
+        public DbSet<OrderItem> OrderItems => Set<OrderItem>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            var order = modelBuilder.Entity<Order>();
+            order.ToTable("Orders");
+            order.HasKey(item => item.Id);
+            order.Property(item => item.OrderNumber).HasMaxLength(30).IsRequired();
+            order.HasIndex(item => item.OrderNumber).IsUnique();
+            order.Property(item => item.Status).HasMaxLength(30).IsRequired();
+            order.Property(item => item.PaymentMethod).HasMaxLength(30).IsRequired();
+            order.Property(item => item.PaymentStatus).HasMaxLength(30).IsRequired();
+            order.Property(item => item.FullName).HasMaxLength(100).IsRequired();
+            order.Property(item => item.Phone).HasMaxLength(30).IsRequired();
+            order.Property(item => item.Address).HasMaxLength(300).IsRequired();
+            order.Property(item => item.City).HasMaxLength(100).IsRequired();
+            order.Property(item => item.PostalCode).HasMaxLength(20).IsRequired();
+            order.Property(item => item.Notes).HasMaxLength(500);
+            order.Property(item => item.Subtotal).HasPrecision(18, 2);
+            order.Property(item => item.DeliveryFee).HasPrecision(18, 2);
+            order.Property(item => item.Total).HasPrecision(18, 2);
+            order.HasOne<User>().WithMany().HasForeignKey(item => item.UserId).OnDelete(DeleteBehavior.Restrict);
+
+            var orderItem = modelBuilder.Entity<OrderItem>();
+            orderItem.ToTable("OrderItems");
+            orderItem.HasKey(item => item.Id);
+            orderItem.Property(item => item.ProductName).HasMaxLength(200).IsRequired();
+            orderItem.Property(item => item.UnitPrice).HasPrecision(18, 2);
+            orderItem.Property(item => item.LineTotal).HasPrecision(18, 2);
+            orderItem.HasOne(item => item.Order).WithMany(item => item.Items).HasForeignKey(item => item.OrderId).OnDelete(DeleteBehavior.Cascade);
+
             var user = modelBuilder.Entity<User>();
 
             user.ToTable("Users");
