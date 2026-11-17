@@ -67,7 +67,7 @@ export function StorefrontHeader({ overlay = false }: { overlay?: boolean }) {
           {isAuthenticated && <NavLink to={accountPath}><span>05</span>{session?.role === "Admin" ? "Admin dashboard" : "My account"}</NavLink>}
         </nav>
         <div className="site-mobile-account">
-          {isAuthenticated ? <><p>Signed in as <strong>{session?.username}</strong></p><button type="button" onClick={logout}>Sign out</button></> : <><Link to="/login">Sign in</Link><Link to="/register">Create account</Link></>}
+          {isAuthenticated ? <><p>Signed in as <strong>{session?.username}</strong></p><button type="button" onClick={() => void logout()}>Sign out</button></> : <><Link to="/login">Sign in</Link><Link to="/register">Create account</Link></>}
         </div>
       </div>
     </header>

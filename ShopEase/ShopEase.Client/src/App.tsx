@@ -16,6 +16,8 @@ import { AdminDashboardPage } from "./pages/AdminDashboardPage";
 import { AdminProductsPage } from "./pages/AdminProductsPage";
 import { AdminCategoriesPage } from "./pages/AdminCategoriesPage";
 import { AdminInventoryPage } from "./pages/AdminInventoryPage";
+import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
+import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 
 export default function App() {
   return (
@@ -25,6 +27,8 @@ export default function App() {
       <Route path="/cart" element={<CartPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
 
       <Route element={<ProtectedRoute />}>
         <Route path="/checkout" element={<CheckoutPage />} />

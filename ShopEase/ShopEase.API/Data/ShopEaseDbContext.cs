@@ -19,6 +19,7 @@ namespace ShopEase.API.Data
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
         public DbSet<ShippingAddress> ShippingAddresses => Set<ShippingAddress>();
         public DbSet<StockMovement> StockMovements => Set<StockMovement>();
+        public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -80,8 +81,23 @@ namespace ShopEase.API.Data
             user.Property(item => item.Role).HasMaxLength(20).IsRequired();
             user.Property(item => item.FullName).HasMaxLength(100).IsRequired();
             user.Property(item => item.Email).HasMaxLength(254).IsRequired();
+            user.Property(item => item.NormalizedEmail).HasMaxLength(254);
             user.Property(item => item.Phone).HasMaxLength(30).IsRequired();
             user.HasIndex(item => item.NormalizedUsername).IsUnique();
+            user.HasIndex(item => item.NormalizedEmail)
+                .IsUnique()
+                .HasFilter("[NormalizedEmail] IS NOT NULL");
+
+            var passwordResetToken = modelBuilder.Entity<PasswordResetToken>();
+            passwordResetToken.ToTable("PasswordResetTokens");
+            passwordResetToken.HasKey(item => item.Id);
+            passwordResetToken.Property(item => item.TokenHash).HasMaxLength(64).IsRequired();
+            passwordResetToken.HasIndex(item => item.TokenHash).IsUnique();
+            passwordResetToken.HasIndex(item => new { item.UserId, item.ExpiresAtUtc });
+            passwordResetToken.HasOne(item => item.User)
+                .WithMany()
+                .HasForeignKey(item => item.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             var category = modelBuilder.Entity<Category>();
 

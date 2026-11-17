@@ -78,6 +78,7 @@ export function LoginPage() {
               </button>
             </div>
           </label>
+          <div className="auth-form-help"><Link to="/forgot-password">Forgot password?</Link></div>
           <button className="primary-button" type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Signing in…" : "Sign in"}
             {!isSubmitting && <span aria-hidden="true">→</span>}

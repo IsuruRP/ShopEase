@@ -33,8 +33,17 @@ public class ProfileController : ControllerBase
         var user = await _db.Users.SingleOrDefaultAsync(item => item.Id == GetUserId(), token);
         if (user is null) return NotFound(new { message = "Customer profile was not found." });
 
+        var normalizedEmail = request.Email.Trim().ToUpperInvariant();
+        if (await _db.Users.AnyAsync(
+                item => item.Id != user.Id && item.NormalizedEmail == normalizedEmail,
+                token))
+        {
+            return Conflict(new { message = "This email is already registered." });
+        }
+
         user.FullName = request.FullName.Trim();
         user.Email = request.Email.Trim().ToLowerInvariant();
+        user.NormalizedEmail = normalizedEmail;
         user.Phone = request.Phone.Trim();
         await _db.SaveChangesAsync(token);
 

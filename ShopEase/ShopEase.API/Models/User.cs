@@ -16,5 +16,9 @@ public class User
 
     public string Email { get; set; } = "";
 
+    public string? NormalizedEmail { get; set; }
+
     public string Phone { get; set; } = "";
+
+    public int TokenVersion { get; set; }
 }

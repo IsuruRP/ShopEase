@@ -1,8 +1,12 @@
 export interface AuthResponse {
-  token: string;
   expiresAtUtc: string;
   username: string;
   role: "Admin" | "Customer";
+}
+
+export interface RegisterCredentials extends AuthCredentials {
+  fullName: string;
+  email: string;
 }
 
 export interface AuthCredentials {

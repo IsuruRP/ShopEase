@@ -4,6 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>shopease-api-7d7420fe-1c3a-47ec-9470-9d8c07a36010</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

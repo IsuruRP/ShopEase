@@ -5,6 +5,7 @@ const API_BASE_URL =
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
@@ -15,24 +16,6 @@ let unauthorizedHandler: (() => void) | null = null;
 export function setUnauthorizedHandler(handler: (() => void) | null) {
   unauthorizedHandler = handler;
 }
-
-apiClient.interceptors.request.use((config) => {
-  const storedSession = localStorage.getItem("shopease.auth");
-
-  if (storedSession) {
-    try {
-      const { token } = JSON.parse(storedSession) as { token?: string };
-
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    } catch {
-      localStorage.removeItem("shopease.auth");
-    }
-  }
-
-  return config;
-});
 
 apiClient.interceptors.response.use(
   (response) => response,

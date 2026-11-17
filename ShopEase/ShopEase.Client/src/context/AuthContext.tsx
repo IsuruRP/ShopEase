@@ -9,83 +9,69 @@ import {
 } from "react";
 import * as authApi from "../api/auth";
 import { setUnauthorizedHandler } from "../api/client";
-import type { AuthCredentials, AuthResponse } from "../types";
-
-const STORAGE_KEY = "shopease.auth";
+import type { AuthCredentials, AuthResponse, RegisterCredentials } from "../types";
 
 interface AuthContextValue {
   session: AuthResponse | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: (credentials: AuthCredentials) => Promise<AuthResponse>;
-  register: (credentials: AuthCredentials) => Promise<void>;
-  logout: () => void;
+  register: (credentials: RegisterCredentials) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-function readStoredSession(): AuthResponse | null {
-  const storedSession = localStorage.getItem(STORAGE_KEY);
-
-  if (!storedSession) return null;
-
-  try {
-    const session = JSON.parse(storedSession) as AuthResponse;
-
-    if (new Date(session.expiresAtUtc).getTime() <= Date.now()) {
-      localStorage.removeItem(STORAGE_KEY);
-      return null;
-    }
-
-    return session;
-  } catch {
-    localStorage.removeItem(STORAGE_KEY);
-    return null;
-  }
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<AuthResponse | null>(readStoredSession);
+  const [session, setSession] = useState<AuthResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const saveSession = useCallback((newSession: AuthResponse) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newSession));
-    setSession(newSession);
+  const clearSession = useCallback(() => setSession(null), []);
+
+  const logout = useCallback(async () => {
+    try {
+      await authApi.logout();
+    } finally {
+      clearSession();
+    }
+  }, [clearSession]);
+
+  const login = useCallback(async (credentials: AuthCredentials) => {
+    const authenticatedSession = await authApi.login(credentials);
+    setSession(authenticatedSession);
+    return authenticatedSession;
   }, []);
 
-  const logout = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY);
-    setSession(null);
+  const register = useCallback(async (credentials: RegisterCredentials) => {
+    setSession(await authApi.register(credentials));
   }, []);
-
-  const login = useCallback(
-    async (credentials: AuthCredentials) => {
-      const authenticatedSession = await authApi.login(credentials);
-      saveSession(authenticatedSession);
-      return authenticatedSession;
-    },
-    [saveSession],
-  );
-
-  const register = useCallback(
-    async (credentials: AuthCredentials) => {
-      saveSession(await authApi.register(credentials));
-    },
-    [saveSession],
-  );
 
   useEffect(() => {
-    setUnauthorizedHandler(logout);
-    return () => setUnauthorizedHandler(null);
-  }, [logout]);
+    let active = true;
+    // Remove sessions created by the old localStorage-based bearer-token flow.
+    localStorage.removeItem("shopease.auth");
+    setUnauthorizedHandler(clearSession);
+
+    authApi.getSession()
+      .then((currentSession) => {
+        if (active) setSession(currentSession);
+      })
+      .catch(() => {
+        if (active) setSession(null);
+      })
+      .finally(() => {
+        if (active) setIsLoading(false);
+      });
+
+    return () => {
+      active = false;
+      setUnauthorizedHandler(null);
+    };
+  }, [clearSession]);
 
   const value = useMemo(
-    () => ({
-      session,
-      isAuthenticated: Boolean(session),
-      login,
-      register,
-      logout,
-    }),
-    [session, login, register, logout],
+    () => ({ session, isAuthenticated: Boolean(session), isLoading, login, register, logout }),
+    [session, isLoading, login, register, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -93,10 +79,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth must be used inside AuthProvider.");
-  }
-
+  if (!context) throw new Error("useAuth must be used inside AuthProvider.");
   return context;
 }

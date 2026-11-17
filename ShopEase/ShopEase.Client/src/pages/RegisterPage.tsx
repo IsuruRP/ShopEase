@@ -7,6 +7,8 @@ import { useAuth } from "../context/AuthContext";
 export function RegisterPage() {
   const { isAuthenticated, register } = useAuth();
   const navigate = useNavigate();
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -29,7 +31,7 @@ export function RegisterPage() {
     setIsSubmitting(true);
 
     try {
-      await register({ username, password });
+      await register({ fullName, email, username, password });
       navigate("/products", { replace: true });
     } catch (requestError) {
       setError(getApiErrorMessage(requestError));
@@ -48,6 +50,31 @@ export function RegisterPage() {
         {error && <div className="form-alert" role="alert">{error}</div>}
 
         <form onSubmit={handleSubmit} className="auth-form">
+          <label>
+            <span>Full name</span>
+            <input
+              type="text"
+              value={fullName}
+              onChange={(event) => setFullName(event.target.value)}
+              placeholder="Enter your full name"
+              autoComplete="name"
+              minLength={2}
+              maxLength={100}
+              required
+            />
+          </label>
+          <label>
+            <span>Email</span>
+            <input
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="you@example.com"
+              autoComplete="email"
+              maxLength={254}
+              required
+            />
+          </label>
           <label>
             <span>Username</span>
             <input
@@ -85,9 +112,7 @@ export function RegisterPage() {
               required
             />
           </label>
-          <p className="form-hint">
-            The first account registered for a new store becomes its administrator.
-          </p>
+          <p className="form-hint">Your account starts with customer access. Administrator access is provisioned securely by the store owner.</p>
           <button className="primary-button" type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Creating account…" : "Create account"}
             {!isSubmitting && <span aria-hidden="true">→</span>}
