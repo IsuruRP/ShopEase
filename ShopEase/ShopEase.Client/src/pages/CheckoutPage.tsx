@@ -1,9 +1,10 @@
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, Navigate } from "react-router-dom";
 import { createAddress, deleteAddress, getAddresses, type ShippingAddress } from "../api/addresses";
 import { getApiErrorMessage } from "../api/client";
 import { createOrder } from "../api/orders";
+import { getProfile } from "../api/profile";
 import { BrandMark } from "../components/BrandMark";
 import { useCart } from "../context/CartContext";
 
@@ -18,6 +19,19 @@ export function CheckoutPage() {
   const formRef = useRef<HTMLFormElement>(null);
   const queryClient = useQueryClient();
   const addressesQuery = useQuery({ queryKey: ["shipping-addresses"], queryFn: getAddresses });
+  const profileQuery = useQuery({ queryKey: ["profile"], queryFn: getProfile });
+
+  useEffect(() => {
+    const form = formRef.current;
+    const profile = profileQuery.data;
+    if (!form || !profile) return;
+
+    const nameInput = form.elements.namedItem("name") as HTMLInputElement;
+    const phoneInput = form.elements.namedItem("phone") as HTMLInputElement;
+    if (!nameInput.value) nameInput.value = profile.fullName;
+    if (!phoneInput.value) phoneInput.value = profile.phone;
+  }, [profileQuery.data]);
+
   if (!items.length && !orderNumber) return <Navigate to="/cart" replace />;
 
   function selectAddress(item: ShippingAddress) {

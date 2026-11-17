@@ -51,6 +51,8 @@ export function AppShell() {
           </NavLink>
           <NavLink to="/cart" className="cart-nav-link"><span className="cart-nav-icon">⌁</span>Cart {itemCount > 0 && <b>{itemCount}</b>}</NavLink>
           <NavLink to="/orders"><span className="cart-nav-icon">□</span>My orders</NavLink>
+          <span className="nav-label account-label">Account</span>
+          <NavLink to="/profile"><span className="cart-nav-icon">@</span>Profile</NavLink>
         </nav>
 
         <div className="sidebar-note">
@@ -100,6 +102,10 @@ export function AppShell() {
           <NavLink to="/orders">
             <span className="mobile-text-icon">#</span>
             <span>Orders</span>
+          </NavLink>
+          <NavLink to="/profile">
+            <span className="mobile-text-icon">@</span>
+            <span>Profile</span>
           </NavLink>
         </nav>
       </div>

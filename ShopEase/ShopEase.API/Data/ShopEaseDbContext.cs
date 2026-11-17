@@ -67,6 +67,9 @@ namespace ShopEase.API.Data
             user.Property(item => item.NormalizedUsername).HasMaxLength(50).IsRequired();
             user.Property(item => item.PasswordHash).HasMaxLength(500).IsRequired();
             user.Property(item => item.Role).HasMaxLength(20).IsRequired();
+            user.Property(item => item.FullName).HasMaxLength(100).IsRequired();
+            user.Property(item => item.Email).HasMaxLength(254).IsRequired();
+            user.Property(item => item.Phone).HasMaxLength(30).IsRequired();
             user.HasIndex(item => item.NormalizedUsername).IsUnique();
 
             var category = modelBuilder.Entity<Category>();
