@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { getCategories, getProducts } from "../api/catalog";
-import { BrandMark } from "../components/BrandMark";
+import { StorefrontFooter } from "../components/StorefrontFooter";
+import { StorefrontHeader } from "../components/StorefrontHeader";
 import { useAuth } from "../context/AuthContext";
-import { useCart } from "../context/CartContext";
 
 const formatPrice = new Intl.NumberFormat("en-LK", {
   style: "currency",
@@ -12,8 +12,7 @@ const formatPrice = new Intl.NumberFormat("en-LK", {
 });
 
 export function HomePage() {
-  const { isAuthenticated, session } = useAuth();
-  const { itemCount } = useCart();
+  const { isAuthenticated } = useAuth();
   const productsQuery = useQuery({ queryKey: ["products"], queryFn: getProducts });
   const categoriesQuery = useQuery({ queryKey: ["categories"], queryFn: getCategories });
   const featuredProducts = productsQuery.data?.slice(0, 3) ?? [];
@@ -21,25 +20,7 @@ export function HomePage() {
 
   return (
     <div className="storefront-home">
-      <header className="storefront-nav">
-        <Link to="/" className="storefront-brand">
-          <BrandMark />
-          <span><strong>ShopEase</strong><small>simple shopping</small></span>
-        </Link>
-        <nav aria-label="Store navigation">
-          <a href="#featured">Featured</a>
-          <a href="#categories">Categories</a>
-          <a href="#why-us">Why us</a>
-        </nav>
-        <div className="storefront-actions">
-          <Link className="nav-login" to="/cart">Cart ({itemCount})</Link>
-          {isAuthenticated ? (
-            <Link className="nav-account" to="/products">Hi, {session?.username}</Link>
-          ) : (
-            <><Link className="nav-login" to="/login">Sign in</Link><Link className="nav-join" to="/register">Join now</Link></>
-          )}
-        </div>
-      </header>
+      <StorefrontHeader overlay />
 
       <main>
         <section className="home-hero">
@@ -99,7 +80,7 @@ export function HomePage() {
         <section className="home-cta"><div><span className="eyebrow light">Your next find is waiting</span><h2>Less searching.<br />More enjoying.</h2></div><Link to={isAuthenticated ? "/products" : "/register"}>Start shopping <span>→</span></Link></section>
       </main>
 
-      <footer className="storefront-footer"><div className="storefront-brand"><BrandMark /><span><strong>ShopEase</strong><small>simple shopping</small></span></div><p>Thoughtful finds for easier days.</p><span>© 2026 ShopEase</span></footer>
+      <StorefrontFooter />
     </div>
   );
 }

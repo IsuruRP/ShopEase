@@ -2,8 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
 import { getProduct } from "../api/catalog";
 import { getApiErrorMessage } from "../api/client";
-import { BrandMark } from "../components/BrandMark";
 import { PageState } from "../components/PageState";
+import { StorefrontFooter } from "../components/StorefrontFooter";
+import { StorefrontHeader } from "../components/StorefrontHeader";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { useState } from "react";
@@ -17,7 +18,7 @@ const formatPrice = new Intl.NumberFormat("en-LK", {
 export function ProductDetailsPage() {
   const { id } = useParams();
   const productId = Number(id);
-  const { isAuthenticated, session } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
   const productQuery = useQuery({
@@ -28,14 +29,7 @@ export function ProductDetailsPage() {
 
   return (
     <div className="detail-page">
-      <header className="detail-nav">
-        <Link to="/" className="storefront-brand dark-brand">
-          <BrandMark />
-          <span><strong>ShopEase</strong><small>simple shopping</small></span>
-        </Link>
-        <nav><Link to="/">Home</Link><Link to={isAuthenticated ? "/products" : "/login"}>Products</Link><Link to={isAuthenticated ? "/categories" : "/login"}>Categories</Link></nav>
-        <Link className="detail-account" to={isAuthenticated ? "/products" : "/login"}>{isAuthenticated ? `Hi, ${session?.username}` : "Sign in"}</Link>
-      </header>
+      <StorefrontHeader />
 
       {!Number.isInteger(productId) || productId <= 0 ? (
         <PageState title="Invalid product" message="This product address is not valid." actionLabel="Back home" onAction={() => window.location.assign("/")} />
@@ -70,6 +64,7 @@ export function ProductDetailsPage() {
           </section>
         </main>
       )}
+      <StorefrontFooter />
     </div>
   );
 }
