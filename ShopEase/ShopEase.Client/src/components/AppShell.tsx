@@ -51,6 +51,12 @@ export function AppShell() {
           </NavLink>
           <NavLink to="/cart" className="cart-nav-link"><span className="cart-nav-icon">⌁</span>Cart {itemCount > 0 && <b>{itemCount}</b>}</NavLink>
           <NavLink to="/orders"><span className="cart-nav-icon">□</span>My orders</NavLink>
+          {session?.role === "Admin" && (
+            <>
+              <span className="nav-label account-label">Management</span>
+              <NavLink to="/admin"><span className="cart-nav-icon">◇</span>Dashboard</NavLink>
+            </>
+          )}
           <span className="nav-label account-label">Account</span>
           <NavLink to="/profile"><span className="cart-nav-icon">@</span>Profile</NavLink>
         </nav>
@@ -86,7 +92,7 @@ export function AppShell() {
         <main>
           <Outlet />
         </main>
-        <nav className="mobile-nav" aria-label="Mobile navigation">
+        <nav className={session?.role === "Admin" ? "mobile-nav admin-mobile-nav" : "mobile-nav"} aria-label="Mobile navigation">
           <NavLink to="/products">
             <ProductsIcon />
             <span>Products</span>
@@ -107,6 +113,12 @@ export function AppShell() {
             <span className="mobile-text-icon">@</span>
             <span>Profile</span>
           </NavLink>
+          {session?.role === "Admin" && (
+            <NavLink to="/admin">
+              <span className="mobile-text-icon">◇</span>
+              <span>Admin</span>
+            </NavLink>
+          )}
         </nav>
       </div>
     </div>

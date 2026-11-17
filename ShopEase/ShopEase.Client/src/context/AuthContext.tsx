@@ -16,7 +16,7 @@ const STORAGE_KEY = "shopease.auth";
 interface AuthContextValue {
   session: AuthResponse | null;
   isAuthenticated: boolean;
-  login: (credentials: AuthCredentials) => Promise<void>;
+  login: (credentials: AuthCredentials) => Promise<AuthResponse>;
   register: (credentials: AuthCredentials) => Promise<void>;
   logout: () => void;
 }
@@ -58,7 +58,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(
     async (credentials: AuthCredentials) => {
-      saveSession(await authApi.login(credentials));
+      const authenticatedSession = await authApi.login(credentials);
+      saveSession(authenticatedSession);
+      return authenticatedSession;
     },
     [saveSession],
   );

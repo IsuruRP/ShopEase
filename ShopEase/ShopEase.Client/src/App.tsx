@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AppShell } from "./components/AppShell";
+import { AdminRoute } from "./components/AdminRoute";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { CategoriesPage } from "./pages/CategoriesPage";
 import { HomePage } from "./pages/HomePage";
@@ -11,6 +12,7 @@ import { CheckoutPage } from "./pages/CheckoutPage";
 import { OrdersPage } from "./pages/OrdersPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { RegisterPage } from "./pages/RegisterPage";
+import { AdminDashboardPage } from "./pages/AdminDashboardPage";
 
 export default function App() {
   return (
@@ -28,6 +30,9 @@ export default function App() {
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/orders" element={<OrdersPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route element={<AdminRoute />}>
+            <Route path="/admin" element={<AdminDashboardPage />} />
+          </Route>
         </Route>
       </Route>
 

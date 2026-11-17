@@ -24,9 +24,10 @@ export function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      await login({ username, password });
+      const authenticatedSession = await login({ username, password });
       const destination =
-        (location.state as { from?: string } | null)?.from ?? "/products";
+        (location.state as { from?: string } | null)?.from ??
+        (authenticatedSession.role === "Admin" ? "/admin" : "/products");
       navigate(destination, { replace: true });
     } catch (requestError) {
       setError(getApiErrorMessage(requestError));
