@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { getAdminDashboard } from "../api/admin";
 import { getApiErrorMessage } from "../api/client";
 import { PageState } from "../components/PageState";
+import { LoadingState } from "../components/LoadingState";
 
 const money = new Intl.NumberFormat("en-LK", {
   style: "currency",
@@ -16,7 +17,7 @@ export function AdminDashboardPage() {
   const query = useQuery({ queryKey: ["admin-dashboard"], queryFn: getAdminDashboard });
 
   if (query.isLoading) {
-    return <div className="catalog-page admin-page"><div className="admin-loading skeleton" /></div>;
+    return <div className="catalog-page admin-page"><LoadingState variant="dashboard" label="Loading admin dashboard" /></div>;
   }
 
   if (query.isError || !query.data) {

@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getCategories } from "../api/catalog";
 import { getApiErrorMessage } from "../api/client";
 import { PageState } from "../components/PageState";
+import { LoadingState } from "../components/LoadingState";
 
 export function CategoriesPage() {
   const categoriesQuery = useQuery({
@@ -35,11 +36,7 @@ export function CategoriesPage() {
       </div>
 
       {categoriesQuery.isLoading && (
-        <div className="category-grid" aria-label="Loading categories">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <div className="category-card skeleton" key={index} />
-          ))}
-        </div>
+        <LoadingState variant="cards" count={4} label="Loading categories" />
       )}
 
       {categoriesQuery.isError && (
@@ -53,6 +50,7 @@ export function CategoriesPage() {
 
       {categoriesQuery.isSuccess && categoriesQuery.data.length === 0 && (
         <PageState
+          variant="empty"
           title="No categories yet"
           message="Categories will appear here as soon as they are added."
         />

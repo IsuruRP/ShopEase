@@ -1,8 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { getCategories, getProducts } from "../api/catalog";
+import { getApiErrorMessage } from "../api/client";
 import { StorefrontFooter } from "../components/StorefrontFooter";
 import { StorefrontHeader } from "../components/StorefrontHeader";
+import { LoadingState } from "../components/LoadingState";
+import { PageState } from "../components/PageState";
 import { useAuth } from "../context/AuthContext";
 
 const formatPrice = new Intl.NumberFormat("en-LK", {
@@ -51,7 +54,9 @@ export function HomePage() {
         <section className="home-section" id="featured">
           <div className="home-section-head"><div><span className="eyebrow">Fresh from the shelf</span><h2>Featured finds</h2></div><Link to={isAuthenticated ? "/products" : "/login"}>View all products →</Link></div>
           <div className="home-product-grid">
-            {productsQuery.isLoading && [1, 2, 3].map((item) => <div className="home-product-card home-loading" key={item} />)}
+            {productsQuery.isLoading && <LoadingState variant="cards" count={3} label="Loading featured products" />}
+            {productsQuery.isError && <PageState compact title="Featured products unavailable" message={getApiErrorMessage(productsQuery.error)} actionLabel="Try again" onAction={() => void productsQuery.refetch()} />}
+            {productsQuery.isSuccess && featuredProducts.length === 0 && <PageState compact variant="empty" title="No featured products yet" message="New products will appear here as soon as they are added." />}
             {featuredProducts.map((product, index) => (
               <article className="home-product-card" key={product.id}>
                 <Link className="home-product-link" to={`/products/${product.id}`}>
@@ -66,7 +71,9 @@ export function HomePage() {
         <section className="home-categories" id="categories">
           <div className="category-intro"><span className="eyebrow light">Find your way</span><h2>Shop by<br />category.</h2><p>Start with what matters and explore a collection that stays easy to understand.</p></div>
           <div className="home-category-list">
-            {categoriesQuery.isLoading && <p className="home-muted">Loading categories…</p>}
+            {categoriesQuery.isLoading && <LoadingState variant="rows" count={3} label="Loading categories" />}
+            {categoriesQuery.isError && <PageState compact title="Categories unavailable" message={getApiErrorMessage(categoriesQuery.error)} actionLabel="Try again" onAction={() => void categoriesQuery.refetch()} />}
+            {categoriesQuery.isSuccess && categories.length === 0 && <PageState compact variant="empty" title="No categories yet" message="The catalog is being organized." />}
             {categories.map((category, index) => <Link to={isAuthenticated ? "/categories" : "/login"} key={category.id}><span>{String(index + 1).padStart(2, "0")}</span><div><strong>{category.name}</strong><small>{category.productCount} products · {category.description}</small></div><b>↗</b></Link>)}
           </div>
         </section>

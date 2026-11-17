@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { getApiErrorMessage } from "../api/client";
 import { getProfile, updateProfile } from "../api/profile";
 import { PageState } from "../components/PageState";
+import { LoadingState } from "../components/LoadingState";
 
 export function ProfilePage() {
   const queryClient = useQueryClient();
@@ -35,7 +36,7 @@ export function ProfilePage() {
   }
 
   if (profileQuery.isLoading) {
-    return <div className="catalog-page"><div className="profile-loading skeleton" /></div>;
+    return <div className="catalog-page"><LoadingState variant="profile" label="Loading customer profile" /></div>;
   }
 
   if (profileQuery.isError || !profileQuery.data) {

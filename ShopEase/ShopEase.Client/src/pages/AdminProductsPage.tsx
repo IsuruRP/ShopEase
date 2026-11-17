@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { createProduct, deleteProduct, getCategories, getProducts, updateProduct } from "../api/catalog";
 import { getApiErrorMessage } from "../api/client";
 import { PageState } from "../components/PageState";
+import { LoadingState } from "../components/LoadingState";
 import type { Category, Product } from "../types";
 
 const money = new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR", maximumFractionDigits: 0 });
@@ -80,15 +81,15 @@ export function AdminProductsPage() {
     <div className="catalog-page crud-page">
       <header className="page-header crud-header"><div><span className="eyebrow">Store management</span><h1>Products.</h1><p>Create, update and organize your inventory.</p></div><div><Link to="/admin">← Dashboard</Link><button onClick={() => setEditor({ open: true, product: null })} disabled={!categoriesQuery.data?.length}>Add product +</button></div></header>
       {actionError && <div className="form-alert crud-alert" role="alert">{actionError}</div>}
-      {loading && <div className="crud-loading skeleton" />}
+      {loading && <LoadingState variant="table" count={6} label="Loading product management" />}
       {failed && <PageState title="Products unavailable" message={getApiErrorMessage(productsQuery.error ?? categoriesQuery.error)} actionLabel="Try again" onAction={() => { void productsQuery.refetch(); void categoriesQuery.refetch(); }} />}
-      {!loading && !failed && !categoriesQuery.data?.length && <PageState title="Create a category first" message="A product must belong to a category." actionLabel="Manage categories" onAction={() => window.location.assign("/admin/categories")} />}
+      {!loading && !failed && !categoriesQuery.data?.length && <PageState variant="empty" title="Create a category first" message="A product must belong to a category." actionLabel="Manage categories" onAction={() => window.location.assign("/admin/categories")} />}
       {!loading && !failed && categoriesQuery.data && categoriesQuery.data.length > 0 && (
         <section className="crud-panel"><div className="crud-panel-head"><strong>{productsQuery.data?.length ?? 0} products</strong><span>Prices and stock are saved immediately.</span></div>
           <div className="crud-table-wrap"><table className="crud-table"><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th><span className="sr-only">Actions</span></th></tr></thead><tbody>
             {productsQuery.data?.map((product) => <tr key={product.id}><td><strong>{product.name}</strong><small>{product.description || "No description"}</small></td><td>{product.categoryName}</td><td>{money.format(product.price)}</td><td><span className={product.stock <= 5 ? "crud-stock low" : "crud-stock"}>{product.stock}</span></td><td><div className="crud-actions"><button onClick={() => setEditor({ open: true, product })}>Edit</button><button className="danger" onClick={() => void remove(product)} disabled={deletingId === product.id}>{deletingId === product.id ? "Deleting..." : "Delete"}</button></div></td></tr>)}
           </tbody></table></div>
-          {productsQuery.data?.length === 0 && <div className="admin-empty">No products yet. Add the first product to your catalog.</div>}
+          {productsQuery.data?.length === 0 && <PageState compact variant="empty" title="No products yet" message="Add the first product to start building your catalog." actionLabel="Add product" onAction={() => setEditor({ open: true, product: null })} />}
         </section>
       )}
       {editor.open && categoriesQuery.data && <ProductEditor key={editor.product?.id ?? "new"} product={editor.product} categories={categoriesQuery.data} onClose={() => setEditor({ open: false, product: null })} onSaved={refresh} />}

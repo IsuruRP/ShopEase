@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getProducts } from "../api/catalog";
 import { getApiErrorMessage } from "../api/client";
 import { PageState } from "../components/PageState";
+import { LoadingState } from "../components/LoadingState";
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
@@ -73,11 +74,7 @@ export function ProductsPage() {
       </div>
 
       {productsQuery.isLoading && (
-        <div className="product-grid" aria-label="Loading products">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <div className="product-card skeleton" key={index} />
-          ))}
-        </div>
+        <LoadingState variant="cards" count={6} label="Loading products" />
       )}
 
       {productsQuery.isError && (
@@ -91,6 +88,7 @@ export function ProductsPage() {
 
       {productsQuery.isSuccess && filteredProducts.length === 0 && (
         <PageState
+          variant="empty"
           title="No products found"
           message="Try a different search term or clear your search."
           actionLabel="Clear search"

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { adjustStock, getStockManagement, type StockProduct } from "../api/inventory";
 import { getApiErrorMessage } from "../api/client";
 import { PageState } from "../components/PageState";
+import { LoadingState } from "../components/LoadingState";
 
 type StockFilter = "all" | "low" | "out";
 
@@ -92,7 +93,7 @@ export function AdminInventoryPage() {
     setSelected(null);
   }
 
-  if (query.isLoading) return <div className="catalog-page inventory-page"><div className="admin-loading skeleton" /></div>;
+  if (query.isLoading) return <div className="catalog-page inventory-page"><LoadingState variant="dashboard" label="Loading inventory" /></div>;
   if (query.isError || !query.data) return <div className="catalog-page inventory-page"><PageState title="Inventory unavailable" message={getApiErrorMessage(query.error)} actionLabel="Try again" onAction={() => void query.refetch()} /></div>;
 
   const data = query.data;

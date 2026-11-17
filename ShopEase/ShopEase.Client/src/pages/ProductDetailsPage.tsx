@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { getProduct } from "../api/catalog";
 import { getApiErrorMessage } from "../api/client";
 import { PageState } from "../components/PageState";
+import { LoadingState } from "../components/LoadingState";
 import { StorefrontFooter } from "../components/StorefrontFooter";
 import { StorefrontHeader } from "../components/StorefrontHeader";
 import { useAuth } from "../context/AuthContext";
@@ -34,7 +35,7 @@ export function ProductDetailsPage() {
       {!Number.isInteger(productId) || productId <= 0 ? (
         <PageState title="Invalid product" message="This product address is not valid." actionLabel="Back home" onAction={() => window.location.assign("/")} />
       ) : productQuery.isLoading ? (
-        <main className="detail-main detail-loading"><div /><div /></main>
+        <LoadingState variant="detail" label="Loading product details" />
       ) : productQuery.isError ? (
         <main className="detail-error"><PageState title="Product not found" message={getApiErrorMessage(productQuery.error)} actionLabel="Back home" onAction={() => window.location.assign("/")} /></main>
       ) : productQuery.data && (
