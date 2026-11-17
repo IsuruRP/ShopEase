@@ -20,6 +20,7 @@ namespace ShopEase.API.Data
         public DbSet<ShippingAddress> ShippingAddresses => Set<ShippingAddress>();
         public DbSet<StockMovement> StockMovements => Set<StockMovement>();
         public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
+        public DbSet<OrderTrackingEvent> OrderTrackingEvents => Set<OrderTrackingEvent>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -58,10 +59,25 @@ namespace ShopEase.API.Data
             order.Property(item => item.City).HasMaxLength(100).IsRequired();
             order.Property(item => item.PostalCode).HasMaxLength(20).IsRequired();
             order.Property(item => item.Notes).HasMaxLength(500);
+            order.Property(item => item.Carrier).HasMaxLength(100);
+            order.Property(item => item.TrackingNumber).HasMaxLength(100);
+            order.Property(item => item.CancellationReason).HasMaxLength(500);
             order.Property(item => item.Subtotal).HasPrecision(18, 2);
             order.Property(item => item.DeliveryFee).HasPrecision(18, 2);
             order.Property(item => item.Total).HasPrecision(18, 2);
             order.HasOne<User>().WithMany().HasForeignKey(item => item.UserId).OnDelete(DeleteBehavior.Restrict);
+
+            var trackingEvent = modelBuilder.Entity<OrderTrackingEvent>();
+            trackingEvent.ToTable("OrderTrackingEvents");
+            trackingEvent.HasKey(item => item.Id);
+            trackingEvent.Property(item => item.Status).HasMaxLength(30).IsRequired();
+            trackingEvent.Property(item => item.Message).HasMaxLength(500).IsRequired();
+            trackingEvent.Property(item => item.CreatedBy).HasMaxLength(100).IsRequired();
+            trackingEvent.HasIndex(item => new { item.OrderId, item.CreatedAtUtc });
+            trackingEvent.HasOne(item => item.Order)
+                .WithMany(item => item.TrackingEvents)
+                .HasForeignKey(item => item.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             var orderItem = modelBuilder.Entity<OrderItem>();
             orderItem.ToTable("OrderItems");

@@ -72,6 +72,19 @@ namespace ShopEase.API.Data.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
+                    b.Property<string>("CancellationReason")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("CancelledAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Carrier")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("City")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -132,6 +145,14 @@ namespace ShopEase.API.Data.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("TrackingNumber")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("UpdatedAtUtc")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
@@ -180,6 +201,42 @@ namespace ShopEase.API.Data.Migrations
                     b.HasIndex("OrderId");
 
                     b.ToTable("OrderItems", (string)null);
+                });
+
+            modelBuilder.Entity("ShopEase.API.Models.OrderTrackingEvent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId", "CreatedAtUtc");
+
+                    b.ToTable("OrderTrackingEvents", (string)null);
                 });
 
             modelBuilder.Entity("ShopEase.API.Models.PasswordResetToken", b =>
@@ -454,6 +511,17 @@ namespace ShopEase.API.Data.Migrations
                     b.Navigation("Order");
                 });
 
+            modelBuilder.Entity("ShopEase.API.Models.OrderTrackingEvent", b =>
+                {
+                    b.HasOne("ShopEase.API.Models.Order", "Order")
+                        .WithMany("TrackingEvents")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+                });
+
             modelBuilder.Entity("ShopEase.API.Models.PasswordResetToken", b =>
                 {
                     b.HasOne("ShopEase.API.Models.User", "User")
@@ -493,6 +561,8 @@ namespace ShopEase.API.Data.Migrations
             modelBuilder.Entity("ShopEase.API.Models.Order", b =>
                 {
                     b.Navigation("Items");
+
+                    b.Navigation("TrackingEvents");
                 });
 #pragma warning restore 612, 618
         }

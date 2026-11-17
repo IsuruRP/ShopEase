@@ -40,6 +40,7 @@ export function AdminDashboardPage() {
         </div>
         <div className="admin-header-actions">
           <Link to="/admin/products">Manage products</Link>
+          <Link to="/admin/orders">Manage orders</Link>
           <Link to="/admin/categories">Manage categories</Link>
           <Link to="/admin/inventory">Manage stock</Link>
         </div>
@@ -63,7 +64,7 @@ export function AdminDashboardPage() {
                 <thead><tr><th>Order</th><th>Customer</th><th>Date</th><th>Status</th><th>Total</th></tr></thead>
                 <tbody>{dashboard.recentOrders.map((order) => (
                   <tr key={order.id}>
-                    <td><strong>{order.orderNumber}</strong><small>COD · {order.paymentStatus}</small></td>
+                    <td><Link className="admin-order-link" to={`/admin/orders/${order.id}`}><strong>{order.orderNumber}</strong><small>COD · {order.paymentStatus}</small></Link></td>
                     <td>{order.customerName}</td>
                     <td>{new Date(order.placedAtUtc).toLocaleDateString("en-LK", { day: "numeric", month: "short", year: "numeric" })}</td>
                     <td><span className={`admin-status ${order.status.toLowerCase()}`}>{order.status}</span></td>

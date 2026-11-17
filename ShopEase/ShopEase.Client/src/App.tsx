@@ -18,6 +18,8 @@ import { AdminCategoriesPage } from "./pages/AdminCategoriesPage";
 import { AdminInventoryPage } from "./pages/AdminInventoryPage";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
+import { AdminOrdersPage } from "./pages/AdminOrdersPage";
+import { AdminOrderDetailsPage } from "./pages/AdminOrderDetailsPage";
 
 export default function App() {
   return (
@@ -42,6 +44,8 @@ export default function App() {
             <Route path="/admin/products" element={<AdminProductsPage />} />
             <Route path="/admin/categories" element={<AdminCategoriesPage />} />
             <Route path="/admin/inventory" element={<AdminInventoryPage />} />
+            <Route path="/admin/orders" element={<AdminOrdersPage />} />
+            <Route path="/admin/orders/:id" element={<AdminOrderDetailsPage />} />
           </Route>
         </Route>
       </Route>

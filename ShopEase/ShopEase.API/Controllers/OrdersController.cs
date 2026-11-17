@@ -25,7 +25,7 @@ public class OrdersController : ControllerBase
 
         var order = new Order
         {
-            UserId = userId, OrderNumber = $"SE-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString("N")[..6].ToUpperInvariant()}", PlacedAtUtc = DateTime.UtcNow,
+            UserId = userId, OrderNumber = $"SE-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString("N")[..6].ToUpperInvariant()}", PlacedAtUtc = DateTime.UtcNow, UpdatedAtUtc = DateTime.UtcNow,
             FullName = request.FullName.Trim(), Phone = request.Phone.Trim(), Address = request.Address.Trim(), City = request.City.Trim(), PostalCode = request.PostalCode.Trim(), Notes = request.Notes.Trim()
         };
         foreach (var product in products)
@@ -39,6 +39,13 @@ public class OrdersController : ControllerBase
         order.Subtotal = order.Items.Sum(item => item.LineTotal);
         order.DeliveryFee = order.Subtotal >= 100000m ? 0m : 750m;
         order.Total = order.Subtotal + order.DeliveryFee;
+        order.TrackingEvents.Add(new OrderTrackingEvent
+        {
+            Status = OrderStatuses.Pending,
+            Message = "Order received and awaiting confirmation.",
+            CreatedBy = "System",
+            CreatedAtUtc = order.PlacedAtUtc
+        });
         _db.Orders.Add(order);
         await _db.SaveChangesAsync(token);
         return CreatedAtAction(nameof(GetMine), new { }, ToResponse(order));
@@ -48,8 +55,28 @@ public class OrdersController : ControllerBase
     public async Task<ActionResult<IEnumerable<OrderResponse>>> GetMine(CancellationToken token)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        return Ok((await _db.Orders.AsNoTracking().Include(order => order.Items).Where(order => order.UserId == userId).OrderByDescending(order => order.PlacedAtUtc).ToListAsync(token)).Select(ToResponse));
+        return Ok((await _db.Orders.AsNoTracking()
+            .Include(order => order.Items)
+            .Include(order => order.TrackingEvents)
+            .Where(order => order.UserId == userId)
+            .OrderByDescending(order => order.PlacedAtUtc)
+            .ToListAsync(token)).Select(ToResponse));
     }
 
-    private static OrderResponse ToResponse(Order order) => new() { Id = order.Id, OrderNumber = order.OrderNumber, PlacedAtUtc = order.PlacedAtUtc, Status = order.Status, PaymentMethod = order.PaymentMethod, PaymentStatus = order.PaymentStatus, Subtotal = order.Subtotal, DeliveryFee = order.DeliveryFee, Total = order.Total, FullName = order.FullName, Address = order.Address, City = order.City, Items = order.Items.Select(item => new OrderItemResponse { ProductId = item.ProductId, ProductName = item.ProductName, UnitPrice = item.UnitPrice, Quantity = item.Quantity, LineTotal = item.LineTotal }).ToList() };
+    private static OrderResponse ToResponse(Order order) => new()
+    {
+        Id = order.Id, OrderNumber = order.OrderNumber, PlacedAtUtc = order.PlacedAtUtc,
+        UpdatedAtUtc = order.UpdatedAtUtc, Status = order.Status, PaymentMethod = order.PaymentMethod,
+        PaymentStatus = order.PaymentStatus, Subtotal = order.Subtotal, DeliveryFee = order.DeliveryFee,
+        Total = order.Total, FullName = order.FullName, Phone = order.Phone, Address = order.Address,
+        City = order.City, PostalCode = order.PostalCode, Notes = order.Notes, Carrier = order.Carrier,
+        TrackingNumber = order.TrackingNumber, CancellationReason = order.CancellationReason,
+        CancelledAtUtc = order.CancelledAtUtc,
+        Items = order.Items.Select(item => new OrderItemResponse { ProductId = item.ProductId, ProductName = item.ProductName, UnitPrice = item.UnitPrice, Quantity = item.Quantity, LineTotal = item.LineTotal }).ToList(),
+        TrackingEvents = order.TrackingEvents.OrderByDescending(item => item.CreatedAtUtc).Select(item => new OrderTrackingEventResponse
+        {
+            Id = item.Id, Status = item.Status, Message = item.Message,
+            CreatedBy = item.CreatedBy, CreatedAtUtc = item.CreatedAtUtc
+        }).ToList()
+    };
 }

@@ -55,6 +55,7 @@ export function AppShell() {
             <>
               <span className="nav-label account-label">Management</span>
               <NavLink to="/admin"><span className="cart-nav-icon">◇</span>Dashboard</NavLink>
+              <NavLink to="/admin/orders"><span className="cart-nav-icon">#</span>Manage orders</NavLink>
               <NavLink to="/admin/products"><ProductsIcon />Manage products</NavLink>
               <NavLink to="/admin/categories"><CategoriesIcon />Manage categories</NavLink>
               <NavLink to="/admin/inventory"><span className="cart-nav-icon">±</span>Stock management</NavLink>
