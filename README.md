@@ -49,4 +49,11 @@ configured. For real email delivery, provide `PasswordRecovery:SmtpHost`,
 secrets or environment variables. Production must run over HTTPS because the
 authentication cookie is `Secure`, `HttpOnly`, and `SameSite=Strict`.
 
+Guest checkout is available without an account. To send real order confirmation
+emails, configure `OrderNotifications:SmtpHost`, `OrderNotifications:SmtpPort`,
+`OrderNotifications:SmtpUsername`, `OrderNotifications:SmtpPassword`, and
+`OrderNotifications:FromEmail` through user secrets or environment variables.
+Without SMTP, Development logs that the confirmation was skipped while keeping
+the successfully created order.
+
 Full Stack E-Commerce Web Application using ASP.NET Core, React and SQL Server

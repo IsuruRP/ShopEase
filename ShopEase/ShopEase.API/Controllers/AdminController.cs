@@ -169,7 +169,7 @@ public class AdminController : ControllerBase
             return Conflict(new { message = $"A {order.Status.ToLowerInvariant()} order can no longer be cancelled." });
         }
 
-        var products = await _db.Products
+        var products = await _db.Products.Include(product => product.Variants)
             .Where(product => order.Items.Select(item => item.ProductId).Contains(product.Id))
             .ToDictionaryAsync(product => product.Id, token);
         var now = DateTime.UtcNow;
@@ -178,6 +178,11 @@ public class AdminController : ControllerBase
             if (!products.TryGetValue(item.ProductId, out var product)) continue;
             var previousStock = product.Stock;
             product.Stock += item.Quantity;
+            if (item.VariantId.HasValue)
+            {
+                var variant = product.Variants.SingleOrDefault(entry => entry.Id == item.VariantId.Value);
+                if (variant is not null) variant.Stock += item.Quantity;
+            }
             _db.StockMovements.Add(new StockMovement
             {
                 ProductId = product.Id, ProductName = product.Name, PreviousStock = previousStock,
@@ -213,12 +218,12 @@ public class AdminController : ControllerBase
         Id = order.Id, UserId = order.UserId, OrderNumber = order.OrderNumber,
         PlacedAtUtc = order.PlacedAtUtc, UpdatedAtUtc = order.UpdatedAtUtc, Status = order.Status,
         PaymentMethod = order.PaymentMethod, PaymentStatus = order.PaymentStatus, Subtotal = order.Subtotal,
-        DeliveryFee = order.DeliveryFee, Total = order.Total, FullName = order.FullName, Phone = order.Phone,
+        DeliveryFee = order.DeliveryFee, Total = order.Total, FullName = order.FullName, Email = order.Email, Phone = order.Phone,
         Address = order.Address, City = order.City, PostalCode = order.PostalCode, Notes = order.Notes,
         Carrier = order.Carrier, TrackingNumber = order.TrackingNumber,
         CancellationReason = order.CancellationReason, CancelledAtUtc = order.CancelledAtUtc,
         CanCancel = OrderStatuses.CanCancel(order.Status), AllowedNextStatuses = OrderStatuses.NextFor(order.Status),
-        Items = order.Items.Select(item => new OrderItemResponse { ProductId = item.ProductId, ProductName = item.ProductName, UnitPrice = item.UnitPrice, Quantity = item.Quantity, LineTotal = item.LineTotal }).ToList(),
+        Items = order.Items.Select(item => new OrderItemResponse { ProductId = item.ProductId, VariantId = item.VariantId, ProductName = item.ProductName, VariantName = item.VariantName, Sku = item.Sku, UnitPrice = item.UnitPrice, Quantity = item.Quantity, LineTotal = item.LineTotal }).ToList(),
         TrackingEvents = order.TrackingEvents.OrderByDescending(item => item.CreatedAtUtc).Select(item => new OrderTrackingEventResponse
         {
             Id = item.Id, Status = item.Status, Message = item.Message,

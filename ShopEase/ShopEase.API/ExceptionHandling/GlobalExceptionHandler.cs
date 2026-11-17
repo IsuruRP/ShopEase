@@ -23,6 +23,10 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                 StatusCodes.Status404NotFound,
                 "Resource not found.",
                 exception.Message),
+            InvalidOperationException => (
+                StatusCodes.Status409Conflict,
+                "Request conflict.",
+                exception.Message),
             _ => (
                 StatusCodes.Status500InternalServerError,
                 "An unexpected error occurred.",

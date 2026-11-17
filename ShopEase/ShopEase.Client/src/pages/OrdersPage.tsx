@@ -21,7 +21,7 @@ export function OrdersPage() {
         <div className="order-card-head"><div><span>Order</span><strong>{order.orderNumber}</strong></div><div><span>Placed</span><strong>{new Date(order.placedAtUtc).toLocaleDateString("en-LK")}</strong></div><b className={order.status.toLowerCase()}>{order.status}</b></div>
         <div className="customer-order-layout">
           <div>
-            <div className="order-items">{order.items.map((item) => <div key={`${order.id}-${item.productId}`}><span>{item.quantity}×</span><strong>{item.productName}</strong><b>{money.format(item.lineTotal)}</b></div>)}</div>
+            <div className="order-items">{order.items.map((item) => <div key={`${order.id}-${item.productId}-${item.variantId ?? "base"}`}><span>{item.quantity}×</span><strong>{item.productName}{item.variantName ? ` · ${item.variantName}` : ""}</strong><b>{money.format(item.lineTotal)}</b></div>)}</div>
             <footer><p>Deliver to <strong>{order.fullName}</strong> · {order.address}, {order.city}</p><div><span>COD · {order.paymentStatus}</span><strong>{money.format(order.total)}</strong></div></footer>
           </div>
           <aside className="customer-tracking">

@@ -52,6 +52,8 @@ public class StockController : ControllerBase
         await using var transaction = await _db.Database.BeginTransactionAsync(IsolationLevel.Serializable, token);
         var product = await _db.Products.SingleOrDefaultAsync(item => item.Id == request.ProductId, token);
         if (product is null) return NotFound(new { message = "Product was not found." });
+        if (await _db.ProductVariants.AnyAsync(item => item.ProductId == product.Id, token))
+            return Conflict(new { message = "This product uses variant-level stock. Adjust its variants in Product Management." });
 
         var newStock = product.Stock + request.QuantityChange;
         if (newStock < 0) return Conflict(new { message = $"Stock cannot fall below zero. {product.Name} currently has {product.Stock} units." });

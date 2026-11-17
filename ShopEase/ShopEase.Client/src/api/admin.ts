@@ -49,7 +49,7 @@ export interface AdminOrderListItem {
 }
 
 export interface AdminOrderDetails extends OrderResponse {
-  userId: number;
+  userId: number | null;
   allowedNextStatuses: string[];
   canCancel: boolean;
 }

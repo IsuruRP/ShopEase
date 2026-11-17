@@ -18,7 +18,7 @@ public class AdminOrderListResponse
 
 public class AdminOrderDetailsResponse : OrderResponse
 {
-    public int UserId { get; set; }
+    public int? UserId { get; set; }
     public bool CanCancel { get; set; }
     public string[] AllowedNextStatuses { get; set; } = [];
 }

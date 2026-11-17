@@ -13,6 +13,7 @@ public class OrderResponse
     public decimal DeliveryFee { get; set; }
     public decimal Total { get; set; }
     public string FullName { get; set; } = "";
+    public string Email { get; set; } = "";
     public string Address { get; set; } = "";
     public string City { get; set; } = "";
     public string Phone { get; set; } = "";
@@ -38,7 +39,10 @@ public class OrderTrackingEventResponse
 public class OrderItemResponse
 {
     public int ProductId { get; set; }
+    public int? VariantId { get; set; }
     public string ProductName { get; set; } = "";
+    public string VariantName { get; set; } = "";
+    public string Sku { get; set; } = "";
     public decimal UnitPrice { get; set; }
     public int Quantity { get; set; }
     public decimal LineTotal { get; set; }

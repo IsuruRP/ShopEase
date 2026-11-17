@@ -5,6 +5,7 @@ namespace ShopEase.API.DTOs;
 public class CreateOrderRequest
 {
     [Required, StringLength(100)] public string FullName { get; set; } = "";
+    [Required, EmailAddress, StringLength(254)] public string Email { get; set; } = "";
     [Required, Phone, StringLength(30)] public string Phone { get; set; } = "";
     [Required, StringLength(300)] public string Address { get; set; } = "";
     [Required, StringLength(100)] public string City { get; set; } = "";
@@ -16,5 +17,6 @@ public class CreateOrderRequest
 public class CreateOrderItemRequest
 {
     [Range(1, int.MaxValue)] public int ProductId { get; set; }
+    public int? VariantId { get; set; }
     [Range(1, 100)] public int Quantity { get; set; }
 }

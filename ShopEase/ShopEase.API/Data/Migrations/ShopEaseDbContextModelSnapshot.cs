@@ -94,6 +94,11 @@ namespace ShopEase.API.Data.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(254)
+                        .HasColumnType("nvarchar(254)");
+
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -153,7 +158,7 @@ namespace ShopEase.API.Data.Migrations
                     b.Property<DateTime>("UpdatedAtUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -192,9 +197,22 @@ namespace ShopEase.API.Data.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<string>("Sku")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
                     b.Property<decimal>("UnitPrice")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("VariantId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("VariantName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.HasKey("Id");
 
@@ -282,6 +300,11 @@ namespace ShopEase.API.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Brand")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
@@ -299,12 +322,24 @@ namespace ShopEase.API.Data.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("Sku")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
                     b.Property<int>("Stock")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("Brand");
+
+                    b.HasIndex("Sku")
+                        .IsUnique();
+
+                    b.HasIndex("Stock");
+
+                    b.HasIndex("CategoryId", "Price");
 
                     b.ToTable("Products", (string)null);
 
@@ -312,21 +347,131 @@ namespace ShopEase.API.Data.Migrations
                         new
                         {
                             Id = 1,
+                            Brand = "ShopEase",
                             CategoryId = 1,
                             Description = "Gaming Laptop",
                             Name = "Laptop",
                             Price = 250000m,
+                            Sku = "SE-P-0001",
                             Stock = 10
                         },
                         new
                         {
                             Id = 2,
+                            Brand = "ShopEase",
                             CategoryId = 2,
                             Description = "Android Phone",
                             Name = "Smartphone",
                             Price = 85000m,
+                            Sku = "SE-P-0002",
                             Stock = 20
                         });
+                });
+
+            modelBuilder.Entity("ShopEase.API.Models.ProductImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AltText")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId", "SortOrder");
+
+                    b.ToTable("ProductImages", (string)null);
+                });
+
+            modelBuilder.Entity("ShopEase.API.Models.ProductSpecification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId", "SortOrder");
+
+                    b.ToTable("ProductSpecifications", (string)null);
+                });
+
+            modelBuilder.Entity("ShopEase.API.Models.ProductVariant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Sku")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<int>("Stock")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("Sku")
+                        .IsUnique();
+
+                    b.ToTable("ProductVariants", (string)null);
                 });
 
             modelBuilder.Entity("ShopEase.API.Models.ShippingAddress", b =>
@@ -496,8 +641,7 @@ namespace ShopEase.API.Data.Migrations
                     b.HasOne("ShopEase.API.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 
             modelBuilder.Entity("ShopEase.API.Models.OrderItem", b =>
@@ -544,6 +688,39 @@ namespace ShopEase.API.Data.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("ShopEase.API.Models.ProductImage", b =>
+                {
+                    b.HasOne("ShopEase.API.Models.Product", "Product")
+                        .WithMany("Images")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("ShopEase.API.Models.ProductSpecification", b =>
+                {
+                    b.HasOne("ShopEase.API.Models.Product", "Product")
+                        .WithMany("Specifications")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("ShopEase.API.Models.ProductVariant", b =>
+                {
+                    b.HasOne("ShopEase.API.Models.Product", "Product")
+                        .WithMany("Variants")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("ShopEase.API.Models.ShippingAddress", b =>
                 {
                     b.HasOne("ShopEase.API.Models.User", null)
@@ -563,6 +740,15 @@ namespace ShopEase.API.Data.Migrations
                     b.Navigation("Items");
 
                     b.Navigation("TrackingEvents");
+                });
+
+            modelBuilder.Entity("ShopEase.API.Models.Product", b =>
+                {
+                    b.Navigation("Images");
+
+                    b.Navigation("Specifications");
+
+                    b.Navigation("Variants");
                 });
 #pragma warning restore 612, 618
         }

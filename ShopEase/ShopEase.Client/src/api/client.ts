@@ -11,6 +11,11 @@ export const apiClient = axios.create({
   },
 });
 
+export function getMediaUrl(path: string) {
+  if (!path || path.startsWith("http://") || path.startsWith("https://")) return path;
+  return `${new URL(API_BASE_URL, window.location.origin).origin}${path}`;
+}
+
 let unauthorizedHandler: (() => void) | null = null;
 
 export function setUnauthorizedHandler(handler: (() => void) | null) {

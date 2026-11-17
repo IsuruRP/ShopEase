@@ -21,6 +21,9 @@ namespace ShopEase.API.Data
         public DbSet<StockMovement> StockMovements => Set<StockMovement>();
         public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
         public DbSet<OrderTrackingEvent> OrderTrackingEvents => Set<OrderTrackingEvent>();
+        public DbSet<ProductImage> ProductImages => Set<ProductImage>();
+        public DbSet<ProductVariant> ProductVariants => Set<ProductVariant>();
+        public DbSet<ProductSpecification> ProductSpecifications => Set<ProductSpecification>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -54,6 +57,7 @@ namespace ShopEase.API.Data
             order.Property(item => item.PaymentMethod).HasMaxLength(30).IsRequired();
             order.Property(item => item.PaymentStatus).HasMaxLength(30).IsRequired();
             order.Property(item => item.FullName).HasMaxLength(100).IsRequired();
+            order.Property(item => item.Email).HasMaxLength(254).IsRequired();
             order.Property(item => item.Phone).HasMaxLength(30).IsRequired();
             order.Property(item => item.Address).HasMaxLength(300).IsRequired();
             order.Property(item => item.City).HasMaxLength(100).IsRequired();
@@ -65,7 +69,7 @@ namespace ShopEase.API.Data
             order.Property(item => item.Subtotal).HasPrecision(18, 2);
             order.Property(item => item.DeliveryFee).HasPrecision(18, 2);
             order.Property(item => item.Total).HasPrecision(18, 2);
-            order.HasOne<User>().WithMany().HasForeignKey(item => item.UserId).OnDelete(DeleteBehavior.Restrict);
+            order.HasOne<User>().WithMany().HasForeignKey(item => item.UserId).OnDelete(DeleteBehavior.SetNull);
 
             var trackingEvent = modelBuilder.Entity<OrderTrackingEvent>();
             trackingEvent.ToTable("OrderTrackingEvents");
@@ -83,6 +87,8 @@ namespace ShopEase.API.Data
             orderItem.ToTable("OrderItems");
             orderItem.HasKey(item => item.Id);
             orderItem.Property(item => item.ProductName).HasMaxLength(200).IsRequired();
+            orderItem.Property(item => item.VariantName).HasMaxLength(150);
+            orderItem.Property(item => item.Sku).HasMaxLength(80).IsRequired();
             orderItem.Property(item => item.UnitPrice).HasPrecision(18, 2);
             orderItem.Property(item => item.LineTotal).HasPrecision(18, 2);
             orderItem.HasOne(item => item.Order).WithMany(item => item.Items).HasForeignKey(item => item.OrderId).OnDelete(DeleteBehavior.Cascade);
@@ -128,11 +134,45 @@ namespace ShopEase.API.Data
             product.HasKey(item => item.Id);
             product.Property(item => item.Name).HasMaxLength(200).IsRequired();
             product.Property(item => item.Description).HasMaxLength(1000);
+            product.Property(item => item.Sku).HasMaxLength(80).IsRequired();
+            product.Property(item => item.Brand).HasMaxLength(100).IsRequired();
             product.Property(item => item.Price).HasPrecision(18, 2);
+            product.HasIndex(item => item.Sku).IsUnique();
+            product.HasIndex(item => item.Brand);
+            product.HasIndex(item => new { item.CategoryId, item.Price });
+            product.HasIndex(item => item.Stock);
             product.HasOne(item => item.Category)
                 .WithMany(item => item.Products)
                 .HasForeignKey(item => item.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            var productImage = modelBuilder.Entity<ProductImage>();
+            productImage.ToTable("ProductImages");
+            productImage.HasKey(item => item.Id);
+            productImage.Property(item => item.Url).HasMaxLength(500).IsRequired();
+            productImage.Property(item => item.AltText).HasMaxLength(200);
+            productImage.HasIndex(item => new { item.ProductId, item.SortOrder });
+            productImage.HasOne(item => item.Product).WithMany(item => item.Images)
+                .HasForeignKey(item => item.ProductId).OnDelete(DeleteBehavior.Cascade);
+
+            var productVariant = modelBuilder.Entity<ProductVariant>();
+            productVariant.ToTable("ProductVariants");
+            productVariant.HasKey(item => item.Id);
+            productVariant.Property(item => item.Name).HasMaxLength(150).IsRequired();
+            productVariant.Property(item => item.Sku).HasMaxLength(80).IsRequired();
+            productVariant.Property(item => item.Price).HasPrecision(18, 2);
+            productVariant.HasIndex(item => item.Sku).IsUnique();
+            productVariant.HasOne(item => item.Product).WithMany(item => item.Variants)
+                .HasForeignKey(item => item.ProductId).OnDelete(DeleteBehavior.Cascade);
+
+            var productSpecification = modelBuilder.Entity<ProductSpecification>();
+            productSpecification.ToTable("ProductSpecifications");
+            productSpecification.HasKey(item => item.Id);
+            productSpecification.Property(item => item.Name).HasMaxLength(100).IsRequired();
+            productSpecification.Property(item => item.Value).HasMaxLength(500).IsRequired();
+            productSpecification.HasIndex(item => new { item.ProductId, item.SortOrder });
+            productSpecification.HasOne(item => item.Product).WithMany(item => item.Specifications)
+                .HasForeignKey(item => item.ProductId).OnDelete(DeleteBehavior.Cascade);
 
             category.HasData(
                 new Category
@@ -154,6 +194,8 @@ namespace ShopEase.API.Data
                     Id = 1,
                     Name = "Laptop",
                     Description = "Gaming Laptop",
+                    Sku = "SE-P-0001",
+                    Brand = "ShopEase",
                     Price = 250000m,
                     Stock = 10,
                     CategoryId = 1
@@ -163,6 +205,8 @@ namespace ShopEase.API.Data
                     Id = 2,
                     Name = "Smartphone",
                     Description = "Android Phone",
+                    Sku = "SE-P-0002",
+                    Brand = "ShopEase",
                     Price = 85000m,
                     Stock = 20,
                     CategoryId = 2

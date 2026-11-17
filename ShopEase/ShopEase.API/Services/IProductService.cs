@@ -5,7 +5,8 @@ namespace ShopEase.API.Services
 {
     public interface IProductService
     {
-        Task<IReadOnlyList<Product>> GetAllAsync(
+        Task<(IReadOnlyList<Product> Items, int Total)> GetPageAsync(
+            ProductQueryRequest request,
             CancellationToken cancellationToken = default);
 
         Task<Product?> GetByIdAsync(

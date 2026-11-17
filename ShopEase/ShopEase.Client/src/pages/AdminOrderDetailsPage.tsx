@@ -55,7 +55,7 @@ export function AdminOrderDetailsPage() {
         <main className="admin-order-main">
           <section className="admin-panel order-detail-card">
             <header><div><span className="eyebrow">Purchase</span><h2>Order items</h2></div><strong>{money.format(order.total)}</strong></header>
-            <div className="order-detail-items">{order.items.map((item) => <article key={item.productId}><span>{item.quantity}×</span><div><strong>{item.productName}</strong><small>{money.format(item.unitPrice)} each</small></div><b>{money.format(item.lineTotal)}</b></article>)}</div>
+            <div className="order-detail-items">{order.items.map((item) => <article key={`${item.productId}-${item.variantId ?? "base"}`}><span>{item.quantity}×</span><div><strong>{item.productName}{item.variantName ? ` · ${item.variantName}` : ""}</strong><small>{item.sku} · {money.format(item.unitPrice)} each</small></div><b>{money.format(item.lineTotal)}</b></article>)}</div>
             <div className="order-totals"><p><span>Subtotal</span><strong>{money.format(order.subtotal)}</strong></p><p><span>Delivery</span><strong>{order.deliveryFee === 0 ? "Free" : money.format(order.deliveryFee)}</strong></p><p><span>Total</span><strong>{money.format(order.total)}</strong></p></div>
           </section>
 
@@ -76,7 +76,7 @@ export function AdminOrderDetailsPage() {
             {order.trackingNumber && <div className="tracking-reference"><span>Shipment reference</span><strong>{order.trackingNumber}</strong><small>{order.carrier}</small></div>}
           </section>
 
-          <section className="admin-panel customer-detail-card"><span className="eyebrow">Customer</span><h2>Delivery details</h2><dl><div><dt>Name</dt><dd>{order.fullName}</dd></div><div><dt>Phone</dt><dd>{order.phone}</dd></div><div><dt>Address</dt><dd>{order.address}, {order.city} {order.postalCode}</dd></div><div><dt>Payment</dt><dd>Cash on Delivery · {order.paymentStatus}</dd></div>{order.notes && <div><dt>Customer note</dt><dd>{order.notes}</dd></div>}</dl></section>
+          <section className="admin-panel customer-detail-card"><span className="eyebrow">Customer</span><h2>Delivery details</h2><dl><div><dt>Name</dt><dd>{order.fullName}</dd></div><div><dt>Email</dt><dd><a href={`mailto:${order.email}`}>{order.email}</a></dd></div><div><dt>Phone</dt><dd>{order.phone}</dd></div><div><dt>Address</dt><dd>{order.address}, {order.city} {order.postalCode}</dd></div><div><dt>Payment</dt><dd>Cash on Delivery · {order.paymentStatus}</dd></div>{order.notes && <div><dt>Customer note</dt><dd>{order.notes}</dd></div>}</dl></section>
 
           {order.canCancel && <section className="admin-panel cancellation-card"><span className="eyebrow">Cancellation</span>{!showCancellation ? <><p>Cancellation restores every reserved item to inventory and records an audit entry.</p><button onClick={() => setShowCancellation(true)}>Cancel this order</button></> : <><label><span>Reason</span><textarea value={cancellationReason} onChange={(event) => setCancellationReason(event.target.value)} minLength={3} maxLength={500} autoFocus /></label><div><button onClick={() => setShowCancellation(false)}>Keep order</button><button className="danger" disabled={cancellationReason.trim().length < 3 || cancelMutation.isPending} onClick={() => cancelMutation.mutate()}>{cancelMutation.isPending ? "Cancelling…" : "Cancel and restore stock"}</button></div></>}</section>}
         </aside>

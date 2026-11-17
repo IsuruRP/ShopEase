@@ -39,6 +39,8 @@ builder.Services.Configure<AdminSeedOptions>(
     builder.Configuration.GetSection(AdminSeedOptions.SectionName));
 builder.Services.Configure<PasswordRecoveryOptions>(
     builder.Configuration.GetSection(PasswordRecoveryOptions.SectionName));
+builder.Services.Configure<OrderNotificationOptions>(
+    builder.Configuration.GetSection(OrderNotificationOptions.SectionName));
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -117,6 +119,16 @@ builder.Services.AddRateLimiter(options =>
                 QueueLimit = 0,
                 AutoReplenishment = true
             }));
+    options.AddPolicy("checkout", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(10),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            }));
 });
 builder.Services.AddCors(options =>
 {
@@ -142,6 +154,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IPasswordResetEmailSender, PasswordResetEmailSender>();
 builder.Services.AddScoped<AdminSeeder>();
+builder.Services.AddScoped<IOrderEmailSender, OrderEmailSender>();
 
 var app = builder.Build();
 
@@ -152,6 +165,7 @@ await using (var scope = app.Services.CreateAsyncScope())
 
 app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseExceptionHandler();
+app.UseStaticFiles();
 app.UseCors("ShopEaseClient");
 app.UseRateLimiter();
 app.UseAuthentication();

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { getCategories, getProducts } from "../api/catalog";
-import { getApiErrorMessage } from "../api/client";
+import { getApiErrorMessage, getMediaUrl } from "../api/client";
 import { StorefrontFooter } from "../components/StorefrontFooter";
 import { StorefrontHeader } from "../components/StorefrontHeader";
 import { LoadingState } from "../components/LoadingState";
@@ -16,9 +16,9 @@ const formatPrice = new Intl.NumberFormat("en-LK", {
 
 export function HomePage() {
   const { isAuthenticated } = useAuth();
-  const productsQuery = useQuery({ queryKey: ["products"], queryFn: getProducts });
+  const productsQuery = useQuery({ queryKey: ["products", "featured"], queryFn: () => getProducts({ pageSize: 3 }) });
   const categoriesQuery = useQuery({ queryKey: ["categories"], queryFn: getCategories });
-  const featuredProducts = productsQuery.data?.slice(0, 3) ?? [];
+  const featuredProducts = productsQuery.data?.items ?? [];
   const categories = categoriesQuery.data?.slice(0, 4) ?? [];
 
   return (
@@ -60,7 +60,7 @@ export function HomePage() {
             {featuredProducts.map((product, index) => (
               <article className="home-product-card" key={product.id}>
                 <Link className="home-product-link" to={`/products/${product.id}`}>
-                <div className={`home-product-art home-art-${index + 1}`}><span>{product.name.charAt(0)}</span><small>{product.categoryName}</small></div>
+                <div className={`home-product-art home-art-${index + 1} ${product.images[0] ? "has-media" : ""}`}>{product.images[0] ? <img src={getMediaUrl(product.images[0].url)} alt={product.images[0].altText || product.name} /> : <><span>{product.name.charAt(0)}</span><small>{product.categoryName}</small></>}</div>
                 <div className="home-product-copy"><span>{product.stock > 0 ? "In stock" : "Out of stock"}</span><h3>{product.name}</h3><p>{product.description}</p><strong>{formatPrice.format(product.price)}</strong></div>
                 </Link>
               </article>
