@@ -30,8 +30,11 @@ public class OrdersController : ControllerBase
         };
         foreach (var product in products)
         {
-            var quantity = requested[product.Id]; product.Stock -= quantity;
+            var quantity = requested[product.Id];
+            var previousStock = product.Stock;
+            product.Stock -= quantity;
             order.Items.Add(new OrderItem { ProductId = product.Id, ProductName = product.Name, UnitPrice = product.Price, Quantity = quantity, LineTotal = product.Price * quantity });
+            _db.StockMovements.Add(new StockMovement { ProductId = product.Id, ProductName = product.Name, PreviousStock = previousStock, QuantityChange = -quantity, NewStock = product.Stock, Reason = "Order", Note = order.OrderNumber, PerformedBy = "System", CreatedAtUtc = DateTime.UtcNow });
         }
         order.Subtotal = order.Items.Sum(item => item.LineTotal);
         order.DeliveryFee = order.Subtotal >= 100000m ? 0m : 750m;

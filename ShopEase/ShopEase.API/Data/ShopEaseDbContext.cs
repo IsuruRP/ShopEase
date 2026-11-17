@@ -18,9 +18,20 @@ namespace ShopEase.API.Data
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
         public DbSet<ShippingAddress> ShippingAddresses => Set<ShippingAddress>();
+        public DbSet<StockMovement> StockMovements => Set<StockMovement>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            var stockMovement = modelBuilder.Entity<StockMovement>();
+            stockMovement.ToTable("StockMovements");
+            stockMovement.HasKey(item => item.Id);
+            stockMovement.Property(item => item.ProductName).HasMaxLength(200).IsRequired();
+            stockMovement.Property(item => item.Reason).HasMaxLength(50).IsRequired();
+            stockMovement.Property(item => item.Note).HasMaxLength(300);
+            stockMovement.Property(item => item.PerformedBy).HasMaxLength(100).IsRequired();
+            stockMovement.HasIndex(item => item.CreatedAtUtc);
+            stockMovement.HasIndex(item => item.ProductId);
+
             var shippingAddress = modelBuilder.Entity<ShippingAddress>();
             shippingAddress.ToTable("ShippingAddresses");
             shippingAddress.HasKey(item => item.Id);
