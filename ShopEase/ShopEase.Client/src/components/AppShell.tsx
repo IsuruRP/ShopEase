@@ -55,6 +55,8 @@ export function AppShell() {
             <>
               <span className="nav-label account-label">Management</span>
               <NavLink to="/admin"><span className="cart-nav-icon">◇</span>Dashboard</NavLink>
+              <NavLink to="/admin/products"><ProductsIcon />Manage products</NavLink>
+              <NavLink to="/admin/categories"><CategoriesIcon />Manage categories</NavLink>
             </>
           )}
           <span className="nav-label account-label">Account</span>

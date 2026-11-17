@@ -38,8 +38,8 @@ export function AdminDashboardPage() {
           <p>A clear view of orders, customers and inventory.</p>
         </div>
         <div className="admin-header-actions">
-          <Link to="/products">Manage products</Link>
-          <Link to="/categories">Manage categories</Link>
+          <Link to="/admin/products">Manage products</Link>
+          <Link to="/admin/categories">Manage categories</Link>
         </div>
       </header>
 
@@ -79,13 +79,13 @@ export function AdminDashboardPage() {
             <div className="stock-healthy"><span>✓</span><strong>Inventory looks healthy</strong><small>No products are below the threshold.</small></div>
           ) : (
             <div className="stock-list">{dashboard.lowStockProducts.map((product) => (
-              <Link to="/products" key={product.id}>
+              <Link to="/admin/products" key={product.id}>
                 <div><strong>{product.name}</strong><small>{product.categoryName}</small></div>
                 <span className={product.stock === 0 ? "out" : ""}>{product.stock === 0 ? "Out" : `${product.stock} left`}</span>
               </Link>
             ))}</div>
           )}
-          <Link className="admin-panel-link" to="/products">Review inventory →</Link>
+          <Link className="admin-panel-link" to="/admin/products">Review inventory →</Link>
         </aside>
       </div>
     </div>
