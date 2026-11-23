@@ -7,16 +7,43 @@ const CartContext = createContext<CartContextValue | undefined>(undefined);
 const STORAGE_KEY = "shopease.cart";
 const itemKey = (productId: number, variantId?: number) => `${productId}:${variantId ?? "base"}`;
 
+function isStoredCartItem(value: unknown): value is CartItem {
+  if (!value || typeof value !== "object") return false;
+  const item = value as Partial<CartItem>;
+  return Boolean(
+    item.product &&
+    Number.isInteger(item.product.id) &&
+    typeof item.product.name === "string" &&
+    Number.isFinite(item.product.price),
+  );
+}
+
 function readCart(): CartItem[] {
   try {
-    const items = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]") as CartItem[];
-    return items.map((item) => ({ ...item, key: item.key ?? itemKey(item.product.id, item.variant?.id) }));
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]") as unknown;
+    if (!Array.isArray(stored)) return [];
+
+    return stored.filter(isStoredCartItem).map((item) => ({
+      ...item,
+      key: item.key ?? itemKey(item.product.id, item.variant?.id),
+      quantity: Number.isFinite(item.quantity) ? Math.max(1, item.quantity) : 1,
+      product: {
+        ...item.product,
+        stock: Number.isFinite(item.product.stock) ? item.product.stock : 0,
+        images: Array.isArray(item.product.images) ? item.product.images : [],
+        variants: Array.isArray(item.product.variants) ? item.product.variants : [],
+        specifications: Array.isArray(item.product.specifications) ? item.product.specifications : [],
+      },
+    }));
   } catch { return []; }
 }
 
 export function AuthlessCartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>(readCart);
-  useEffect(() => localStorage.setItem(STORAGE_KEY, JSON.stringify(items)), [items]);
+  useEffect(() => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+    catch { /* Keep the in-memory cart usable when storage is unavailable. */ }
+  }, [items]);
   const addItem = (product: Product, quantity = 1, variant?: ProductVariant) => {
     const key = itemKey(product.id, variant?.id); const available = variant?.stock ?? product.stock;
     setItems((current) => current.some((item) => item.key === key)
