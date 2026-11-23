@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { getCategories, getProducts } from "../api/catalog";
-import { getApiErrorMessage, getMediaUrl } from "../api/client";
+import { getApiErrorMessage, getMediaUrl, getProductFallbackImage } from "../api/client";
 import { StorefrontFooter } from "../components/StorefrontFooter";
 import { StorefrontHeader } from "../components/StorefrontHeader";
 import { LoadingState } from "../components/LoadingState";
@@ -38,9 +38,7 @@ export function HomePage() {
             <div className="hero-proof"><strong>2+</strong><span>curated categories</span><strong>100%</strong><span>clear stock & pricing</span></div>
           </div>
           <div className="hero-showcase" aria-label="Featured ShopEase collection">
-            <div className="showcase-orbit orbit-a" /><div className="showcase-orbit orbit-b" />
-            <div className="showcase-product product-a"><span>L</span><div><small>Featured</small><strong>Laptop</strong></div></div>
-            <div className="showcase-product product-b"><span>S</span><div><small>Popular</small><strong>Smartphone</strong></div></div>
+            <img className="hero-showcase-image" src="/images/shopease-hero.png" alt="A curated laptop and smartphone collection" fetchPriority="high" />
             <div className="showcase-badge"><b>✓</b><span>Easy choices<br /><small>Clear details, always</small></span></div>
           </div>
         </section>
@@ -57,14 +55,16 @@ export function HomePage() {
             {productsQuery.isLoading && <LoadingState variant="cards" count={3} label="Loading featured products" />}
             {productsQuery.isError && <PageState compact title="Featured products unavailable" message={getApiErrorMessage(productsQuery.error)} actionLabel="Try again" onAction={() => void productsQuery.refetch()} />}
             {productsQuery.isSuccess && featuredProducts.length === 0 && <PageState compact variant="empty" title="No featured products yet" message="New products will appear here as soon as they are added." />}
-            {featuredProducts.map((product, index) => (
-              <article className="home-product-card" key={product.id}>
+            {featuredProducts.map((product, index) => {
+              const image = product.images[0];
+              const imageUrl = image ? getMediaUrl(image.url) : getProductFallbackImage(product.name);
+              return <article className="home-product-card" key={product.id}>
                 <Link className="home-product-link" to={`/products/${product.id}`}>
-                <div className={`home-product-art home-art-${index + 1} ${product.images[0] ? "has-media" : ""}`}>{product.images[0] ? <img src={getMediaUrl(product.images[0].url)} alt={product.images[0].altText || product.name} /> : <><span>{product.name.charAt(0)}</span><small>{product.categoryName}</small></>}</div>
+                <div className={`home-product-art home-art-${index + 1} ${imageUrl ? "has-media" : ""}`}>{imageUrl ? <img className={!image ? "fallback-product-image" : undefined} src={imageUrl} alt={image?.altText || product.name} loading="lazy" /> : <><span>{product.name.charAt(0)}</span><small>{product.categoryName}</small></>}</div>
                 <div className="home-product-copy"><span>{product.stock > 0 ? "In stock" : "Out of stock"}</span><h3>{product.name}</h3><p>{product.description}</p><strong>{formatPrice.format(product.price)}</strong></div>
                 </Link>
               </article>
-            ))}
+            })}
           </div>
         </section>
 

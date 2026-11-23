@@ -16,6 +16,17 @@ export function getMediaUrl(path: string) {
   return `${new URL(API_BASE_URL, window.location.origin).origin}${path}`;
 }
 
+export function getProductFallbackImage(productName: string) {
+  const normalizedName = productName.trim().toLowerCase();
+
+  if (normalizedName.includes("laptop")) return "/images/product-laptop.png";
+  if (normalizedName.includes("smartphone") || normalizedName.includes("phone")) {
+    return "/images/product-smartphone.png";
+  }
+
+  return "";
+}
+
 let unauthorizedHandler: (() => void) | null = null;
 
 export function setUnauthorizedHandler(handler: (() => void) | null) {

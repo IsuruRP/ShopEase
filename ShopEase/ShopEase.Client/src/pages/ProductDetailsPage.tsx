@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
 import { getProduct } from "../api/catalog";
-import { getApiErrorMessage, getMediaUrl } from "../api/client";
+import { getApiErrorMessage, getMediaUrl, getProductFallbackImage } from "../api/client";
 import { PageState } from "../components/PageState";
 import { LoadingState } from "../components/LoadingState";
 import { StorefrontFooter } from "../components/StorefrontFooter";
@@ -25,11 +25,12 @@ export function ProductDetailsPage() {
   const selectedVariant = variants.find((item) => item.id === selectedVariantId);
   const price = selectedVariant?.price ?? product?.price ?? 0;
   const stock = selectedVariant?.stock ?? (variants.length ? 0 : product?.stock ?? 0);
+  const fallbackImage = product ? getProductFallbackImage(product.name) : "";
 
   return <div className="detail-page"><StorefrontHeader />
     {query.isLoading ? <LoadingState variant="detail" label="Loading product details" /> : query.isError || !product ? <main className="detail-error"><PageState title="Product not found" message={getApiErrorMessage(query.error)} actionLabel="Back home" onAction={() => window.location.assign("/")} /></main> : <main className="detail-main product-media-detail">
       <section className="product-gallery">
-        <div className={`detail-art detail-art-${((product.id - 1) % 4) + 1} ${product.images.length ? "has-media" : ""}`}>{product.images.length ? <img src={getMediaUrl(product.images[activeImage]?.url)} alt={product.images[activeImage]?.altText || product.name} /> : <><div className="detail-art-ring" /><span>{product.name.charAt(0)}</span><small>{product.categoryName}</small></>}</div>
+        <div className={`detail-art detail-art-${((product.id - 1) % 4) + 1} ${product.images.length || fallbackImage ? "has-media" : ""}`}>{product.images.length || fallbackImage ? <img className={!product.images.length ? "fallback-product-image" : undefined} src={product.images.length ? getMediaUrl(product.images[activeImage]?.url) : fallbackImage} alt={product.images[activeImage]?.altText || product.name} /> : <><div className="detail-art-ring" /><span>{product.name.charAt(0)}</span><small>{product.categoryName}</small></>}</div>
         {product.images.length > 1 && <div className="product-thumbnails">{product.images.map((image, index) => <button className={activeImage === index ? "active" : ""} key={image.id} onClick={() => setActiveImage(index)}><img src={getMediaUrl(image.url)} alt={image.altText || `${product.name} view ${index + 1}`} /></button>)}</div>}
       </section>
       <section className="detail-copy">
